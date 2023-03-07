@@ -1,18 +1,18 @@
-import { FC } from 'react';
-import type { AppProps /*, AppContext */ } from 'next/app';
-import Sidebar from '../components/sidebar';
+import '../styles/globals.css'
+import 'tailwindcss/tailwind.css';
 
-const MyApp: FC<AppProps> = ({ Component, pageProps }) => {
+import React from 'react'
+import { Windmill } from '@roketid/windmill-react-ui'
+import type { AppProps } from 'next/app'
+
+function MyApp({ Component, pageProps }: AppProps) {
+  // suppress useLayoutEffect warnings when running outside a browser
+  if (!process.browser) React.useLayoutEffect = React.useEffect;
+
   return (
-    <div style={{ display: 'flex', maxWidth: 1100 }}>
-      <div style={{ flexBasis: '30%', margin: 25 }}>
-        <Sidebar />
-      </div>
-      <div style={{ flexBasis: '70%', margin: 25 }}>
-        <Component {...pageProps} />
-      </div>
-    </div>
-  );
-};
-
-export default MyApp;
+    <Windmill usePreferences={true}>
+      <Component {...pageProps} />
+    </Windmill>
+  )
+}
+export default MyApp

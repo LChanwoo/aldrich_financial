@@ -10,7 +10,7 @@ import { BlogService } from './blog/blog.service';
     RenderModule.forRootAsync(
       Next({
         dev: process.env.NODE_ENV !== 'production',
-        conf: { useFilesystemPublicRoutes: false },
+        conf: { useFilesystemPublicRoutes: true },
       }),
     ),
   ],
