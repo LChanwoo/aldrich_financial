@@ -5,7 +5,7 @@
     "jsx": "preserve",
     "strict": true,
     "pretty": true,
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "alwaysStrict": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,

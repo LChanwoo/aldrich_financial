@@ -10,6 +10,7 @@ import RoundIcon from 'example/components/RoundIcon'
 import Layout from 'example/containers/Layout'
 import response, { ITableData } from 'utils/demo/tableData'
 import { ChatIcon, CartIcon, MoneyIcon, PeopleIcon } from 'icons'
+import io from 'socket.io-client';
 
 import {
   TableBody,
@@ -56,7 +57,7 @@ function Dashboard() {
   )
 
   const [page, setPage] = useState(1)
-  const [data, setData] = useState<ITableData[]>([])
+  const [data, setData] = useState<any>([])
 
   // pagination setup
   const resultsPerPage = 10
@@ -70,7 +71,28 @@ function Dashboard() {
   // on page change, load new sliced data
   // here you would make another server request for new data
   useEffect(() => {
-    setData(response.slice((page - 1) * resultsPerPage, page * resultsPerPage))
+     //WebSocket 서버와 연결합니다.
+    const socket = io('/ws-coin-price');
+    socket.on('connect', () => {
+      console.log('Socket connected');
+      // socket.emit('subscribe', 'coinPrice');
+    });
+    
+    socket.on('disconnect', () => {
+      console.log('Socket disconnected');
+    });
+    // 코인 가격 정보를 받으면, 화면에 업데이트합니다.
+    socket.on('coinPriceUpdate', (data) => {
+      // setData(data.slice((page - 1) * resultsPerPage, page * resultsPerPage))
+      // setCoinPrice(data);
+      const response = data.map((item:any)=>JSON.parse(item!.toString()))
+      setData(response);
+      console.log(response);
+    });
+    return () => {
+      // 페이지가 unmount 될 때, WebSocket 연결을 종료합니다.
+      socket.close();
+    };
   }, [page])
 
   return (
@@ -126,14 +148,32 @@ function Dashboard() {
         <Table>
           <TableHeader>
             <tr>
-              <TableCell>Client</TableCell>
-              <TableCell>Amount</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Date</TableCell>
+              <TableCell>종목</TableCell>
+              <TableCell>현재가</TableCell>
+              <TableCell>전일대비</TableCell>
             </tr>
           </TableHeader>
           <TableBody>
-            {data.map((user, i) => (
+          {data.map((user, i) => (
+              <TableRow key={i}>
+                <TableCell>
+                  <div className="flex items-center text-sm">
+                    <div>
+                      <p className="font-semibold">{user.code}</p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400">
+                      </p>
+                    </div>
+                  </div>
+                </TableCell>
+                <TableCell>
+                  <span className="text-sm">{user.trade_price} KRW</span>
+                </TableCell>
+                <TableCell>
+                  <Badge type={user.status}>{(100 - user.trade_price/user.prev_closing_price*100).toFixed(2)}%</Badge>
+                </TableCell>
+              </TableRow>
+            ))}
+            {/* {data.map((user, i) => (
               <TableRow key={i}>
                 <TableCell>
                   <div className="flex items-center text-sm">
@@ -162,7 +202,7 @@ function Dashboard() {
                   </span>
                 </TableCell>
               </TableRow>
-            ))}
+            ))} */}
           </TableBody>
         </Table>
         <TableFooter>
