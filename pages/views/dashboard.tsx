@@ -11,7 +11,7 @@ import Layout from 'example/containers/Layout'
 import response, { ITableData } from 'utils/demo/tableData'
 import { ChatIcon, CartIcon, MoneyIcon, PeopleIcon } from 'icons'
 import io from 'socket.io-client';
-
+import axios from 'axios'
 import {
   TableBody,
   TableContainer,
@@ -23,6 +23,11 @@ import {
   Avatar,
   Badge,
   Pagination,
+  Label,
+  HelperText,
+  Input,
+  Textarea,
+  Select
 } from '@roketid/windmill-react-ui'
 
 import {
@@ -43,8 +48,10 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js'
+import SectionTitle from 'example/components/Typography/SectionTitle'
 
-function Dashboard() {
+function Dashboard(coindData) {
+  // console.log(coindData.coinData.coinPrice)
   Chart.register(
     ArcElement,
     CategoryScale,
@@ -57,8 +64,11 @@ function Dashboard() {
   )
 
   const [page, setPage] = useState(1)
-  const [data, setData] = useState<any>([])
-
+  const [data, setData] = useState<any>(coindData.coinData.coinPrice.map(e=>JSON.parse(e)))
+  const [amount,setAmount] = useState(0)
+  const [price,setPrice] = useState(0)
+  const [totalPrice,setTotalPrice] = useState(0)
+  const [select,setSelect] = useState("매수")
   // pagination setup
   const resultsPerPage = 10
   const totalResults = response.length
@@ -66,6 +76,20 @@ function Dashboard() {
   // pagination change control
   function onPageChange(p: number) {
     setPage(p)
+  }
+
+  const onChangeAmount = (e:any) => {
+    setAmount(e.target.value.toLocaleString());
+    setTotalPrice(e.target.value * price);
+  }
+
+  const onChangePrice = (e:any) => {
+    setPrice(e.target.value.toLocaleString());
+    setTotalPrice(e.target.value * amount);
+  }
+  const onChangeSelect = (e:any) => {
+    setSelect(e.target.value);
+    console.log(e.target.value);
   }
 
   // on page change, load new sliced data
@@ -87,7 +111,7 @@ function Dashboard() {
       // setCoinPrice(data);
       const response = data.map((item:any)=>JSON.parse(item!.toString()))
       setData(response);
-      console.log(response);
+      // console.log(response);
     });
     return () => {
       // 페이지가 unmount 될 때, WebSocket 연결을 종료합니다.
@@ -102,8 +126,29 @@ function Dashboard() {
       <CTA />
 
       {/* <!-- Cards --> */}
+      <div className='grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-2'>
+          <InfoCard title="보유KRW" value="376" className="w-1/2">
+            {/* @ts-ignore */}
+            <RoundIcon
+              icon={CartIcon}
+              iconColorClass="text-blue-500 dark:text-blue-100"
+              bgColorClass="bg-blue-100 dark:bg-blue-500"
+              className="mr-4 "
+            />
+          </InfoCard>
+
+          <InfoCard title="총 보유자산" value="376" className="w-1/2" >
+            {/* @ts-ignore */}
+            <RoundIcon
+              icon={CartIcon}
+              iconColorClass="text-blue-500 dark:text-blue-100"
+              bgColorClass="bg-blue-100 dark:bg-blue-500"
+              className="mr-4"
+            />
+          </InfoCard>
+        </div>
       <div className="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-4">
-        <InfoCard title="Total clients" value="6389">
+        <InfoCard title="총매수" value="6389">
           {/* @ts-ignore */}
           <RoundIcon
             icon={PeopleIcon}
@@ -113,7 +158,7 @@ function Dashboard() {
           />
         </InfoCard>
 
-        <InfoCard title="Account balance" value="$ 46,760.89">
+        <InfoCard title="총 평가" value="46,760.89">
           {/* @ts-ignore */}
           <RoundIcon
             icon={MoneyIcon}
@@ -123,7 +168,7 @@ function Dashboard() {
           />
         </InfoCard>
 
-        <InfoCard title="New sales" value="376">
+        <InfoCard title="평가손익" value="376">
           {/* @ts-ignore */}
           <RoundIcon
             icon={CartIcon}
@@ -133,7 +178,7 @@ function Dashboard() {
           />
         </InfoCard>
 
-        <InfoCard title="Pending contacts" value="35">
+        <InfoCard title="수익률" value="35">
           {/* @ts-ignore */}
           <RoundIcon
             icon={ChatIcon}
@@ -142,93 +187,154 @@ function Dashboard() {
             className="mr-4"
           />
         </InfoCard>
+
       </div>
-
-      <TableContainer>
-        <Table>
-          <TableHeader>
-            <tr>
-              <TableCell>종목</TableCell>
-              <TableCell>현재가</TableCell>
-              <TableCell>전일대비</TableCell>
-            </tr>
-          </TableHeader>
-          <TableBody>
-          {data.map((user, i) => (
-              <TableRow key={i}>
-                <TableCell>
-                  <div className="flex items-center text-sm">
-                    <div>
-                      <p className="font-semibold">{user.code}</p>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">
-                      </p>
+      <div className='sm:flex sm:w-full sm:flex-row '>
+        <div className="max-w-2xl md:w-1/2 w-full min-w-max" >
+        <TableContainer>
+          <Table>
+            <TableHeader>
+              <tr className=''>
+                <TableCell>종목</TableCell>
+                <TableCell>현재가</TableCell>
+                <TableCell>전일대비</TableCell>
+              </tr>
+            </TableHeader>
+            <TableBody>
+            {data.map((user, i) => (
+                <TableRow key={i}>
+                  <TableCell>
+                    <div className="flex items-center text-sm">
+                      <div>
+                        <p className="font-semibold">{user.code.replace("KRW-","")}</p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm">{user.trade_price} KRW</span>
-                </TableCell>
-                <TableCell>
-                  <Badge type={user.status}>{(100 - user.trade_price/user.prev_closing_price*100).toFixed(2)}%</Badge>
-                </TableCell>
-              </TableRow>
-            ))}
-            {/* {data.map((user, i) => (
-              <TableRow key={i}>
-                <TableCell>
-                  <div className="flex items-center text-sm">
-                    <Avatar
-                      className="hidden mr-3 md:block"
-                      src={user.avatar}
-                      alt="User image"
-                    />
-                    <div>
-                      <p className="font-semibold">{user.name}</p>
-                      <p className="text-xs text-gray-600 dark:text-gray-400">
-                        {user.job}
-                      </p>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm">$ {user.amount}</span>
-                </TableCell>
-                <TableCell>
-                  <Badge type={user.status}>{user.status}</Badge>
-                </TableCell>
-                <TableCell>
-                  <span className="text-sm">
-                    {new Date(user.date).toLocaleDateString()}
-                  </span>
-                </TableCell>
-              </TableRow>
-            ))} */}
-          </TableBody>
-        </Table>
-        <TableFooter>
-          <Pagination
-            totalResults={totalResults}
-            resultsPerPage={resultsPerPage}
-            label="Table navigation"
-            onChange={onPageChange}
-          />
-        </TableFooter>
-      </TableContainer>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-sm">{user.trade_price.toLocaleString()} KRW</span>
+                  </TableCell>
+                  <TableCell>
+                    <Badge type={
+                      1 - user.trade_price/user.prev_closing_price > 0?'success'
+                      : 1 - user.trade_price/user.prev_closing_price < 0?'danger'
+                      : 'neutral'
+                      }>{(100 - user.trade_price/user.prev_closing_price*100).toFixed(2)}%</Badge>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+          <TableFooter>
+            {/* <Pagination
+              totalResults={totalResults}
+              resultsPerPage={resultsPerPage}
+              label="Table navigation"
+              onChange={onPageChange}
+            /> */}
+          </TableFooter>
+        </TableContainer>
+        </div>
+        <div className='max-w-2xl md:w-1/2 w-full min-w-max m-3'>
+          <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
+        <Label>
+          <Input className="mt-1" placeholder="BTC" readOnly/>
+        </Label>
 
-      <PageTitle>Charts</PageTitle>
-      <div className="grid gap-6 mb-8 md:grid-cols-2">
-        <ChartCard title="Revenue">
-          <Doughnut {...doughnutOptions} />
-          <ChartLegend legends={doughnutLegends} />
-        </ChartCard>
+        {/* <Label className="mt-4">
+          <Input disabled className="mt-1" placeholder="주문가" />
+        </Label> */}
 
-        <ChartCard title="Traffic">
-          <Line {...lineOptions} />
-          <ChartLegend legends={lineLegends} />
-        </ChartCard>
+        <div className="mt-4">
+          {/* TODO: Check if this label is accessible, or fallback */}
+          {/* <span className="text-sm text-gray-700 dark:text-gray-400">Account Type</span> */}
+          <div className="mt-2">
+            <Label radio>
+              <Input type="radio" value="매수" name="accountType" onClick={onChangeSelect} defaultChecked />
+              <span className="ml-2">매수</span>
+            </Label>
+            <Label className="ml-6" radio>
+              <Input type="radio" value="매도" name="accountType" onClick={onChangeSelect} />
+              <span className="ml-2">매도</span>
+            </Label>
+            {/* <Label disabled className="ml-6" radio>
+              <Input disabled type="radio" value="disabled" name="accountType" />
+              <span className="ml-2">Disabled</span>
+            </Label> */}
+          </div>
+        </div>
+
+        {/* <Label className="mt-4">
+          <span>Requested Limit</span>
+          <Select className="mt-1">
+            <option>$1,000</option>
+            <option>$5,000</option>
+            <option>$10,000</option>
+            <option>$25,000</option>
+          </Select>
+        </Label>
+
+        <Label className="mt-4">
+          <span>Multiselect</span>
+          <Select className="mt-1" multiple>
+            <option>Option 1</option>
+            <option>Option 2</option>
+            <option>Option 3</option>
+            <option>Option 4</option>
+            <option>Option 5</option>
+          </Select>
+        </Label> */}
+
+        {/* <Label className="mt-4">
+          <span>Message</span>
+          <Textarea className="mt-1" rows={3} placeholder="Enter some long form content." />
+        </Label> */}
+        <span>수량</span>
+        <Label>
+          <Input className="mt-1" placeholder="수량" value={amount.toLocaleString()} onChange={onChangeAmount}/>
+        </Label>
+        <span>가격</span>
+        <Label>
+          <Input className="mt-1" placeholder="가격" value={price.toLocaleString()} onChange={onChangePrice}/>
+        </Label>
+        <span>총액</span>
+        <Label>
+          <Input className="mt-1" placeholder="총액" value={totalPrice.toLocaleString()} />
+        </Label>
+
+        <Label className="mt-6" check>
+          <Input type="checkbox" />
+          <div>
+            <span className="ml-2">
+              I agree to the <span className="underline"> policy</span>
+            </span>
+          </div>
+        </Label>
+          <div className="right-0">
+            <button className="inset-y-0 right-0 px-4 text-sm font-medium leading-10 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
+              거래
+            </button>
+          </div>
+         </div>
+
+        </div>
       </div>
     </Layout>
   )
+}
+
+export const getServerSideProps = async () => {
+  try{
+      const res = await axios.get('http://localhost:4100/api/coinPrice');
+      let {data} = res
+      const props ={
+        coinData:data
+      }
+      return {  props }
+  }catch(e){
+      return console.log('error')
+  }
 }
 
 export default Dashboard
