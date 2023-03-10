@@ -6,6 +6,19 @@ import { Label, Input, Button, WindmillContext } from '@roketid/windmill-react-u
 import { GithubIcon, TwitterIcon } from 'icons'
 
 function LoginPage() {
+  const [email, setEmail] = React.useState('')
+  const [password, setPassword] = React.useState('')
+  const onEmailChange = (e) =>{
+    setEmail(e.target.value)
+  }
+  const onPasswordChange = (e) =>{
+    setPassword(e.target.value)
+  }
+
+  const handleSubmit = (e)=>{
+    
+  }
+
   const { mode } = useContext(WindmillContext)
   const imgSource = mode === 'dark' ? '/assets/img/login-office-dark.jpeg' : '/assets/img/login-office.jpeg'
 
@@ -33,6 +46,9 @@ function LoginPage() {
                   className='mt-1'
                   type='email'
                   placeholder='john@doe.com'
+                  value = {email}
+                  onChange={onEmailChange}
+
                 />
               </Label>
 
@@ -42,25 +58,18 @@ function LoginPage() {
                   className='mt-1'
                   type='password'
                   placeholder='***************'
+                  value = {password}
+                  onChange={onPasswordChange}
                 />
               </Label>
 
-              <Link href='/example' passHref={true}>
+              {/* <Link href='/dashboard' passHref={true}> */}
                 <Button className='mt-4' block>
                   Log in
                 </Button>
-              </Link>
+              {/* </Link> */}
 
               <hr className='my-8' />
-
-              <Button block layout='outline'>
-                {/* <GithubIcon className='w-4 h-4 mr-2' aria-hidden='true' /> */}
-                Github
-              </Button>
-              <Button className='mt-4' block layout='outline'>
-                <TwitterIcon className='w-4 h-4 mr-2' aria-hidden='true' />
-                Twitter
-              </Button>
 
               <p className='mt-4'>
                 <Link href='/example/forgot-password'>
@@ -70,7 +79,7 @@ function LoginPage() {
                 </Link>
               </p>
               <p className='mt-1'>
-                <Link href='/example/create-account'>
+                <Link href='/create-account'>
                   <a className='text-sm font-medium text-purple-600 dark:text-purple-400 hover:underline'>
                     Create account
                   </a>

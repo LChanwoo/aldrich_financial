@@ -2,31 +2,42 @@ import { CacheModule, Module } from '@nestjs/common';
 import { RenderModule } from 'nest-next';
 import Next from 'next';
 import { AppController } from './app.controller';
-import { BlogController } from './blog/blog.controller';
-import { BlogService } from './blog/blog.service';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { EventModule } from './gateway/event.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { UserModule } from './user/user.module';
 import * as redisStore from 'cache-manager-ioredis';
+import { Coin } from './entities/Coin.entity';
+import { Transaction } from './entities/Transaction.entity';
+import { Portfolio } from './entities/Portfolio.entity';
+import { User } from './entities/User.entity';
+
 @Module({
   imports: [
     EventModule,
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     RenderModule.forRootAsync(
       Next({
         dev: process.env.NODE_ENV !== 'production',
         conf: { useFilesystemPublicRoutes: true },
       }),
     ),
-    CacheModule.registerAsync({
-      imports: [ConfigModule],
-      useFactory: async (configService: ConfigService) => ({
-        store: redisStore,
-        host: configService.get('REDIS_HOSTNAME'),
-        port: configService.get('REDIS_PORT'),
-      }),
-      inject: [ConfigService],
-    })
+    TypeOrmModule.forRoot({
+      type: 'mysql', // 데이터베이스 타입
+      host: 'localhost', // 호스트 주소
+      port: 3306, // 포트 번호
+      username: 'root', // 사용자 이름
+      password: process.env.MYSQL_ROOT_PASSWORD, // 사용자 비밀번호
+      database: process.env.MYSQL_DATABASE, // 데이터베이스 이름
+      entities: [User, Portfolio, Transaction, Coin], // 엔티티
+      autoLoadEntities: true, // 엔티티 자동 로드 여부
+      synchronize: true, // 스키마 자동 생성 여부
+    }),
+    UserModule
   ],
-  controllers: [AppController, BlogController],
-  providers: [BlogService],
+  controllers: [AppController],
+  providers: [],
 })
 export class AppModule {}

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Doughnut, Line } from 'react-chartjs-2'
-
+import {calCoinPrice} from '../../utils/calCoinPrice'
 import CTA from 'example/components/CTA'
 import InfoCard from 'example/components/Cards/InfoCard'
 import ChartCard from 'example/components/Chart/ChartCard'
@@ -65,6 +65,7 @@ function Dashboard(coindData) {
 
   const [page, setPage] = useState(1)
   const [data, setData] = useState<any>(coindData.coinData.coinPrice.map(e=>JSON.parse(e)))
+  const [coin, setCoin] = useState("BTC")
   const [amount,setAmount] = useState(0)
   const [price,setPrice] = useState(0)
   const [totalPrice,setTotalPrice] = useState(0)
@@ -78,18 +79,35 @@ function Dashboard(coindData) {
     setPage(p)
   }
 
+  const onChangeCoin= async (e:any)=>{
+    // console.log(e.currentTarget.)
+    setCoin(e.currentTarget.id.replace("KRW-",""))    
+    const price = Number(e.currentTarget.childNodes[1].innerText.replace(/[^0-9.]/g, ''));
+    setPrice(price);
+    setTotalPrice(price*amount)
+  }
+
   const onChangeAmount = (e:any) => {
     setAmount(e.target.value.toLocaleString());
     setTotalPrice(e.target.value * price);
   }
 
   const onChangePrice = (e:any) => {
-    setPrice(e.target.value.toLocaleString());
-    setTotalPrice(e.target.value * amount);
+    let p =e.target.value
+    if(typeof p === "string"){
+      p=p.replace(",","")
+    }
+    setPrice(p.toLocaleString());
+    setTotalPrice(p * amount);
   }
   const onChangeSelect = (e:any) => {
     setSelect(e.target.value);
-    console.log(e.target.value);
+  }
+
+  const onblurPrice = (e:any) => {
+    const calPrice = calCoinPrice(price);
+    setPrice(calPrice);
+    setTotalPrice(calPrice * amount);
   }
 
   // on page change, load new sliced data
@@ -202,7 +220,7 @@ function Dashboard(coindData) {
             </TableHeader>
             <TableBody>
             {data.map((user, i) => (
-                <TableRow key={i}>
+                <TableRow key={i} id={user.code} onClick={onChangeCoin}>
                   <TableCell>
                     <div className="flex items-center text-sm">
                       <div>
@@ -217,10 +235,10 @@ function Dashboard(coindData) {
                   </TableCell>
                   <TableCell>
                     <Badge type={
-                      1 - user.trade_price/user.prev_closing_price > 0?'success'
-                      : 1 - user.trade_price/user.prev_closing_price < 0?'danger'
+                      user.trade_price/user.prev_closing_price - 1 > 0?'success'
+                      : 1 - user.trade_price/user.prev_closing_price - 1 < 0?'danger'
                       : 'neutral'
-                      }>{(100 - user.trade_price/user.prev_closing_price*100).toFixed(2)}%</Badge>
+                      }>{(user.trade_price/user.prev_closing_price*100-100).toFixed(2)}%</Badge>
                   </TableCell>
                 </TableRow>
               ))}
@@ -237,9 +255,10 @@ function Dashboard(coindData) {
         </TableContainer>
         </div>
         <div className='max-w-2xl md:w-1/2 w-full min-w-max m-3'>
+          <PageTitle>주문</PageTitle>
           <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <Label>
-          <Input className="mt-1" placeholder="BTC" readOnly/>
+          <Input className="mt-1" value={coin} readOnly/>
         </Label>
 
         {/* <Label className="mt-4">
@@ -292,11 +311,11 @@ function Dashboard(coindData) {
         </Label> */}
         <span>수량</span>
         <Label>
-          <Input className="mt-1" placeholder="수량" value={amount.toLocaleString()} onChange={onChangeAmount}/>
+          <Input className="mt-1" placeholder="수량" value={amount.toLocaleString()} onChange={onChangeAmount} />
         </Label>
         <span>가격</span>
         <Label>
-          <Input className="mt-1" placeholder="가격" value={price.toLocaleString()} onChange={onChangePrice}/>
+          <Input className="mt-1" placeholder="가격" value={price.toLocaleString()} onChange={onChangePrice} onBlur={onblurPrice}/>
         </Label>
         <span>총액</span>
         <Label>
@@ -316,8 +335,105 @@ function Dashboard(coindData) {
               거래
             </button>
           </div>
-         </div>
-
+        </div>
+        <PageTitle>보유자산</PageTitle>
+        <TableContainer>
+          <Table>
+            <TableHeader>
+              <tr className=''>
+                <TableCell>종목</TableCell>
+                <TableCell>평가손익</TableCell>
+                <TableCell>수익률</TableCell>
+                <TableCell>보유수량</TableCell>
+              </tr>
+            </TableHeader>
+            <TableBody>
+            {/* {data.map((user, i) => (
+                <TableRow key={i} id={user.code} onClick={onChangeCoin}>
+                  <TableCell>
+                    <div className="flex items-center text-sm">
+                      <div>
+                        <p className="font-semibold">{user.code.replace("KRW-","")}</p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">
+                        </p>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-sm">{user.trade_price.toLocaleString()} KRW</span>
+                  </TableCell>
+                  <TableCell>
+                    <Badge type={
+                      1 - user.trade_price/user.prev_closing_price > 0?'success'
+                      : 1 - user.trade_price/user.prev_closing_price < 0?'danger'
+                      : 'neutral'
+                      }>{(100 - user.trade_price/user.prev_closing_price*100).toFixed(2)}%</Badge>
+                  </TableCell>
+                </TableRow>
+              ))} */}
+            </TableBody>
+          </Table>
+          <TableFooter>
+            {/* <Pagination
+              totalResults={totalResults}
+              resultsPerPage={resultsPerPage}
+              label="Table navigation"
+              onChange={onPageChange}
+            /> */}
+          </TableFooter>
+        </TableContainer>
+                <PageTitle>미체결 거래</PageTitle>
+        <TableContainer>
+          <Table>
+            <TableHeader>
+              <tr className=''>
+                <TableCell> </TableCell>
+                <TableCell>종목</TableCell>
+                <TableCell>주문가격</TableCell>
+                <TableCell>주문수량</TableCell>
+                <TableCell>주문시간</TableCell>
+              </tr>
+            </TableHeader>
+            <TableBody>
+            {/* {data.map((user, i) => (
+                <TableRow key={i} id={user.code} onClick={onChangeCoin}>
+                  <TableCell> 
+                    <Label className="ml-6" radio>
+                      <Input type="radio" value="i" name="non-trading"  />
+                    </Label>
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center text-sm">
+                      <div>
+                        <p className="font-semibold">{user.code.replace("KRW-","")}</p>
+                        <p className="text-xs text-gray-600 dark:text-gray-400">
+                        </p>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-sm">{user.trade_price.toLocaleString()} KRW</span>
+                  </TableCell>
+                  <TableCell>
+                    <Badge type={
+                      1 - user.trade_price/user.prev_closing_price > 0?'success'
+                      : 1 - user.trade_price/user.prev_closing_price < 0?'danger'
+                      : 'neutral'
+                      }>{(100 - user.trade_price/user.prev_closing_price*100).toFixed(2)}%</Badge>
+                  </TableCell>
+                </TableRow>
+              ))} */}
+            </TableBody>
+          </Table>
+          <TableFooter>
+            {/* <Pagination
+              totalResults={totalResults}
+              resultsPerPage={resultsPerPage}
+              label="Table navigation"
+              onChange={onPageChange}
+            /> */}
+          </TableFooter>
+        </TableContainer>
         </div>
       </div>
     </Layout>

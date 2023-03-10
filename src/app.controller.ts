@@ -9,7 +9,7 @@ export class AppController {
   ){}
 
   @Render('login')
-  @Get()
+  @Get("/login")
   public index(@Query('name') name?: string) {
     return { name };
   }
@@ -28,6 +28,11 @@ export class AppController {
   @Render('dashboard')
   @Get('/dashboard')
   public dashboard() {
+    return {};
+  }
+  @Render('create-account')
+  @Get('/create-account')
+  public createAccount() {
     return {};
   }
   @Render('forms')

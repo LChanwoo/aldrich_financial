@@ -6,7 +6,7 @@
     "strict": true,
     "pretty": true,
     "noImplicitAny": false,
-    "alwaysStrict": true,
+    "alwaysStrict": false,
     "noImplicitReturns": true,
     "noImplicitThis": true,
     "outDir": ".next",
@@ -24,8 +24,6 @@
     "baseUrl": ".",
     "typeRoots": [
       "node_modules/@types",
-      "./typings",
-      "./src"
     ],
     "allowJs": true,
     "forceConsistentCasingInFileNames": true,
@@ -39,7 +37,6 @@
     "./pages/**/*",
     "./src/**/*",
     "./ui/**/*",
-    "types.ts"
   ],
   "exclude": [
     "node_modules"

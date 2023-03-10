@@ -9,7 +9,7 @@
     "build:ui": "npx next build",
     "build:server": "npx tsc --project tsconfig.server.json && npx babel .next/production-server -d .next/production-server --extensions \".js\"",
     "build": "yarn build:clean && yarn build:ui && yarn build:server",
-    "start": "cross-env NODE_ENV=production node .next/production-server/src/main.js --webpack-config ./next.config.js"
+    "start": "cross-env NODE_ENV=production node .next/production-server/main.js "
   },
   "dependencies": {
     "@liaoliaots/nestjs-redis": "^9.0.5",
@@ -18,15 +18,19 @@
     "@nestjs/core": "^9.3.9",
     "@nestjs/platform-express": "^9.3.9",
     "@nestjs/platform-socket.io": "^9.3.9",
+    "@nestjs/typeorm": "^9.0.1",
     "@nestjs/websockets": "^9.3.9",
     "axios": "^1.3.4",
     "cache-manager": "^5.1.7",
     "cache-manager-ioredis": "^2.1.0",
+    "class-validator": "^0.14.0",
     "classnames": "^2.3.1",
     "cookie-parser": "^1.4.6",
     "cross-env": "^7.0.3",
+    "dotenv": "^16.0.3",
     "express-session": "^1.17.3",
     "ioredis": "^5.3.1",
+    "mysql2": "^3.2.0",
     "nest-next": "^10.1.0",
     "nestjs-redis": "^1.3.3",
     "next": "12.1.5",
@@ -39,6 +43,7 @@
     "rxjs": "^7.5.5",
     "socket.io": "^4.6.1",
     "socket.io-client": "^4.6.1",
+    "typeorm": "^0.3.12",
     "ws": "^8.12.1"
   },
   "devDependencies": {
