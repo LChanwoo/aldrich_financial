@@ -33,6 +33,6 @@ export class CoinPriceGateway implements OnGatewayConnection, OnGatewayDisconnec
       const coinPrice = await this.redisService.mget(marketData)
       // console.log( coinPrice )             
       client.emit('coinPriceUpdate', coinPrice);
-    }, 1000);
+    }, 3000);
   }
 }

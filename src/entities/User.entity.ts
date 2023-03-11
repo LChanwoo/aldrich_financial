@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryGeneratedColumn, OneToMany, OneToOne } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany, JoinColumn } from 'typeorm';
 import { Portfolio } from './Portfolio.entity';
 import { Transaction } from './Transaction.entity';
 
@@ -8,15 +8,15 @@ export class User {
   id?: number;
 
   @Column()
-  email?: string;
+  email!: string;
 
   @Column()
-  password?: string;
+  password!: string;
 
   @Column({default: 1000000})
-  balance?: number;
+  balance!: number;
 
-  @OneToOne(() => Transaction, (transaction) => transaction.user)
+  @OneToMany(() => Transaction, (transaction) => transaction.user)
   transactions?: Transaction[];
 
   @OneToMany(() => Portfolio, (portfolio) => portfolio.user)

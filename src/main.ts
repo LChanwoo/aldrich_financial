@@ -21,12 +21,10 @@ async function bootstrap() {
   app.use(cookieParser());
   app.enableCors(
     {
-      // origin: 'http://127.0.0.1:3090',
       credentials: true,
     }
   );
   // app.useGlobalFilters(new HttpExceptionFilter());
-  // app.use(express.static(path.join(__dirname, '/public')));
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.use(passport.initialize());
   app.use(passport.session());

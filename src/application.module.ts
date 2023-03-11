@@ -11,6 +11,7 @@ import { Coin } from './entities/Coin.entity';
 import { Transaction } from './entities/Transaction.entity';
 import { Portfolio } from './entities/Portfolio.entity';
 import { User } from './entities/User.entity';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -35,7 +36,8 @@ import { User } from './entities/User.entity';
       autoLoadEntities: true, // 엔티티 자동 로드 여부
       synchronize: true, // 스키마 자동 생성 여부
     }),
-    UserModule
+    UserModule,
+    AuthModule
   ],
   controllers: [AppController],
   providers: [],
