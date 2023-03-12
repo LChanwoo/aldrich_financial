@@ -1,10 +1,10 @@
 import React, { useContext } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-
+import axios from 'axios'
 import { Label, Input, Button, WindmillContext } from '@roketid/windmill-react-ui'
 import { GithubIcon, TwitterIcon } from 'icons'
-
+import router from 'next/router'
 function LoginPage() {
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
@@ -15,8 +15,16 @@ function LoginPage() {
     setPassword(e.target.value)
   }
 
-  const handleSubmit = (e)=>{
-    
+  const handleSubmit = async (e)=>{
+    e.preventDefault();
+    const data = {email,password}
+    const res = await axios.post("/api/auth",data);
+    if(res.status===201){
+      console.log("success")
+      // router.push('/dashboard')
+      return window.location.href="/dashboard"
+    }
+    console.log(res.status)
   }
 
   const { mode } = useContext(WindmillContext)
@@ -64,7 +72,7 @@ function LoginPage() {
               </Label>
 
               {/* <Link href='/dashboard' passHref={true}> */}
-                <Button className='mt-4' block>
+                <Button className='mt-4' block onClick={handleSubmit}>
                   Log in
                 </Button>
               {/* </Link> */}

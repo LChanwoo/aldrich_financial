@@ -16,6 +16,10 @@ export class User {
   @Column({default: 1000000})
   balance!: number;
 
+  @Column({default: 1000000})
+  availableBalance!: number;
+
+
   @OneToMany(() => Transaction, (transaction) => transaction.user)
   transactions?: Transaction[];
 

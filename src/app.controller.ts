@@ -1,6 +1,10 @@
 import { InjectRedis } from '@liaoliaots/nestjs-redis';
-import { Controller, Get, Query, Render } from '@nestjs/common';
+import { Controller, Get, Query, Render, Req, UseFilters, UseGuards } from '@nestjs/common';
 import Redis from 'ioredis';
+import { LocalAuthGuard } from './auth/auth.guard';
+import { AuthenticatedGuard } from './auth/authenticated.guard';
+import { SessionGuard } from './auth/session.guard';
+import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 @Controller()
 export class AppController {
@@ -27,7 +31,11 @@ export class AppController {
   }
   @Render('dashboard')
   @Get('/dashboard')
-  public dashboard() {
+  @UseGuards(AuthenticatedGuard)
+  // @UseFilters(new HttpExceptionFilter())
+  public dashboard(@Req() req:any) {
+    // console.log("꺄ㅏㅏㅏㅏㅏㅏㅏ1")
+    // console.log(req.user)
     return {};
   }
   @Render('create-account')

@@ -25,7 +25,7 @@ export class Transaction {
   @CreateDateColumn()
   createdAt?: Date;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({default:null})
   doneAt?: Date;
 
   @ManyToOne(() => User, (user) => user.transactions)

@@ -16,7 +16,6 @@ export class Portfolio {
   @Column()
   quantity?: number;
 
-
   @ManyToOne(() => User, (user) => user.portfolios)
   @JoinColumn({ name: 'user_id' })
   user?: User;

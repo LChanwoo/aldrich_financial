@@ -28,11 +28,12 @@ export class EventController {
         return response;
     }
 
-      @Get('/api/coinPrice')
+      // @Get('/api/coinPrice')
   public async coinPrice() {
       const redisMarketData = await this.redisService.getClient().get("marketData")
       const marketData = redisMarketData!.toString().split(",")
       const coinPrice = await this.redisService.getClient().mget(marketData)
+
     return { coinPrice };
   }
 

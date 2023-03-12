@@ -10,6 +10,7 @@ import RoundIcon from 'example/components/RoundIcon'
 import Layout from 'example/containers/Layout'
 import response, { ITableData } from 'utils/demo/tableData'
 import { ChatIcon, CartIcon, MoneyIcon, PeopleIcon } from 'icons'
+import { getSession } from 'next-auth/react';
 import io from 'socket.io-client';
 import axios from 'axios'
 import {
@@ -50,7 +51,7 @@ import {
 } from 'chart.js'
 import SectionTitle from 'example/components/Typography/SectionTitle'
 
-function Dashboard(coindData) {
+function Dashboard(coinData) {
   // console.log(coindData.coinData.coinPrice)
   Chart.register(
     ArcElement,
@@ -64,12 +65,20 @@ function Dashboard(coindData) {
   )
 
   const [page, setPage] = useState(1)
-  const [data, setData] = useState<any>(coindData.coinData.coinPrice.map(e=>JSON.parse(e)))
+  const [data, setData] = useState<any>(coinData.coinPrice.map(e=>JSON.parse(e)))
   const [coin, setCoin] = useState("BTC")
   const [amount,setAmount] = useState(0)
   const [price,setPrice] = useState(0)
+  const [tmpPrice,setTmpPrice] = useState(0);
   const [totalPrice,setTotalPrice] = useState(0)
   const [select,setSelect] = useState("매수")
+  const [balance,setBalance] = useState(coinData.balance)
+  const [availableBalance,setAvailableBalance] = useState(coinData.availableBalance)
+  const [totalPurchase, setTotalPurchase] = useState(0)
+  const [totalValue, setTotalValue] = useState (0)
+  const [gainsAndLoses,setGainsAndLoses] = useState(totalValue-totalPurchase)
+  const [profitRate,setProfitRate] = useState(100-(totalPurchase === 0 ? 100 : totalValue/totalPurchase*100))
+  const [totalAsset,setTotalAsset] = useState(balance+totalValue)
   // pagination setup
   const resultsPerPage = 10
   const totalResults = response.length
@@ -83,31 +92,60 @@ function Dashboard(coindData) {
     // console.log(e.currentTarget.)
     setCoin(e.currentTarget.id.replace("KRW-",""))    
     const price = Number(e.currentTarget.childNodes[1].innerText.replace(/[^0-9.]/g, ''));
+    const amount = (balance/price).toFixed(8)
+    let totalPrice = price * amount;
+    while(totalPrice >balance){
+      amount = amount - 0.00000001
+      totalPrice = price*amount
+    }
+    setAmount(amount);
     setPrice(price);
-    setTotalPrice(price*amount)
+    setTmpPrice(price)
+    setTotalPrice(totalPrice)
   }
 
   const onChangeAmount = (e:any) => {
-    setAmount(e.target.value.toLocaleString());
+    setAmount(e.target.value);
     setTotalPrice(e.target.value * price);
+    if(totalPrice>balance){
+      setTotalPrice(balance)
+
+
+    }
   }
 
   const onChangePrice = (e:any) => {
     let p =e.target.value
     if(typeof p === "string"){
-      p=p.replace(",","")
+      p = p.replace(",","")
+      console.log(p)
     }
-    setPrice(p.toLocaleString());
+    if(p>tmpPrice) p = tmpPrice
+    console.log(tmpPrice)
+    setPrice(p);
     setTotalPrice(p * amount);
   }
+
   const onChangeSelect = (e:any) => {
     setSelect(e.target.value);
   }
-
+  const onblurAmount = (e:any) => {
+    const calAmount = balance/price;
+    setAmount(calAmount.toFixed(8));
+    setTotalPrice(price * calAmount);
+  }
   const onblurPrice = (e:any) => {
     const calPrice = calCoinPrice(price);
+    if(calPrice>tmpPrice){
+      calPrice = tmpPrice
+    }
+    let totalPrice = calPrice *amount
+    if(totalPrice>balance){
+      const amount = (balance/calPrice)
+      setAmount(amount)
+    } 
     setPrice(calPrice);
-    setTotalPrice(calPrice * amount);
+    setTotalPrice(totalPrice);
   }
 
   // on page change, load new sliced data
@@ -144,18 +182,8 @@ function Dashboard(coindData) {
       <CTA />
 
       {/* <!-- Cards --> */}
-      <div className='grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-2'>
-          <InfoCard title="보유KRW" value="376" className="w-1/2">
-            {/* @ts-ignore */}
-            <RoundIcon
-              icon={CartIcon}
-              iconColorClass="text-blue-500 dark:text-blue-100"
-              bgColorClass="bg-blue-100 dark:bg-blue-500"
-              className="mr-4 "
-            />
-          </InfoCard>
-
-          <InfoCard title="총 보유자산" value="376" className="w-1/2" >
+      <div className='grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-3'>
+          <InfoCard title="총 보유자산" value={totalAsset.toLocaleString()} className="w-1/2" >
             {/* @ts-ignore */}
             <RoundIcon
               icon={CartIcon}
@@ -164,9 +192,27 @@ function Dashboard(coindData) {
               className="mr-4"
             />
           </InfoCard>
+          <InfoCard title="보유KRW" value={balance.toLocaleString()} className="w-1/2">
+            {/* @ts-ignore */}
+            <RoundIcon
+              icon={CartIcon}
+              iconColorClass="text-blue-500 dark:text-blue-100"
+              bgColorClass="bg-blue-100 dark:bg-blue-500"
+              className="mr-4 "
+            />
+          </InfoCard>
+          <InfoCard title="가용KRW" value={availableBalance.toLocaleString()} className="w-1/2">
+            {/* @ts-ignore */}
+            <RoundIcon
+              icon={CartIcon}
+              iconColorClass="text-blue-500 dark:text-blue-100"
+              bgColorClass="bg-blue-100 dark:bg-blue-500"
+              className="mr-4 "
+            />
+          </InfoCard>
         </div>
       <div className="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-4">
-        <InfoCard title="총매수" value="6389">
+        <InfoCard title="총매수" value={totalPurchase.toLocaleString()}>
           {/* @ts-ignore */}
           <RoundIcon
             icon={PeopleIcon}
@@ -176,7 +222,7 @@ function Dashboard(coindData) {
           />
         </InfoCard>
 
-        <InfoCard title="총 평가" value="46,760.89">
+        <InfoCard title="총 평가" value={totalValue.toLocaleString()}>
           {/* @ts-ignore */}
           <RoundIcon
             icon={MoneyIcon}
@@ -186,7 +232,7 @@ function Dashboard(coindData) {
           />
         </InfoCard>
 
-        <InfoCard title="평가손익" value="376">
+        <InfoCard title="평가손익" value={gainsAndLoses.toLocaleString()}>
           {/* @ts-ignore */}
           <RoundIcon
             icon={CartIcon}
@@ -196,7 +242,7 @@ function Dashboard(coindData) {
           />
         </InfoCard>
 
-        <InfoCard title="수익률" value="35">
+        <InfoCard title="수익률" value={profitRate}>
           {/* @ts-ignore */}
           <RoundIcon
             icon={ChatIcon}
@@ -311,7 +357,7 @@ function Dashboard(coindData) {
         </Label> */}
         <span>수량</span>
         <Label>
-          <Input className="mt-1" placeholder="수량" value={amount.toLocaleString()} onChange={onChangeAmount} />
+          <Input className="mt-1" placeholder="수량" value={amount.toLocaleString()} onChange={onChangeAmount} onBlur={onblurAmount} />
         </Label>
         <span>가격</span>
         <Label>
@@ -440,16 +486,20 @@ function Dashboard(coindData) {
   )
 }
 
-export const getServerSideProps = async () => {
+export const getServerSideProps = async (ctx) => {
   try{
-      const res = await axios.get('http://localhost:4100/api/coinPrice');
-      let {data} = res
+      const res = await axios.get('http://localhost:4100/api/coinPrice', {
+          headers: { Cookie: ctx.req.headers.cookie },
+      });
+      let {coinPrice, balance, availableBalance} = res.data
       const props ={
-        coinData:data
+        coinPrice,
+        balance,
+        availableBalance
       }
-      return {  props }
-  }catch(e){
-      return console.log('error')
+      return { props }
+  }catch(e: any){
+      return console.log(e.data)
   }
 }
 
