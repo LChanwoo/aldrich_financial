@@ -5,6 +5,8 @@ import { LoginDto } from '../auth/dto/login.dto';
 import { User } from '../common/decorators/user.decorator';
 import { CoinService } from './coin.service';
 import { AuthenticatedGuard } from '../auth/authenticated.guard';
+import { TransactionDto } from './dto/transaction.dto';
+import { UserDataDto } from '../user/dto/userData.dto';
 
 @Controller('')
 export class CoinController {
@@ -20,7 +22,7 @@ export class CoinController {
 
   @Post('/api/order')
   @UseGuards(AuthenticatedGuard)
-  public async order(@Body() body: any ,@User() user:LoginDto){
-    return this.coinService.order(body, user);
+  public async order(@Body() transactionDto: TransactionDto ,@User() user:UserDataDto){
+    return this.coinService.order(transactionDto, user);
   }
 }

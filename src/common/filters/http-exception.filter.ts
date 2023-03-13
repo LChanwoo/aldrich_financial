@@ -14,7 +14,7 @@ import {
       const status = exception.getStatus();
       const error = exception.getResponse();
       // logger.error(`[${request.ip}] ${request.method} ${request.url} ${status} ${JSON.stringify(error)}`);
-      if(status===401){
+      if(status===401||status===403){
         response.redirect('/login')
       }
       response.status(status).json({

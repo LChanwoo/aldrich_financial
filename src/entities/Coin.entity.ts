@@ -16,7 +16,4 @@ export class Coin {
   @OneToOne(() => Transaction, (transaction) => transaction.coin)
   transactions?: Transaction[];
 
-  @OneToOne(() => Portfolio, (portfolio) => portfolio.coin)
-  portfolios?: Portfolio;
-
 }

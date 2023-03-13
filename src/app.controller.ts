@@ -32,7 +32,7 @@ export class AppController {
   @Render('dashboard')
   @Get('/dashboard')
   @UseGuards(AuthenticatedGuard)
-  // @UseFilters(new HttpExceptionFilter())
+  @UseFilters(new HttpExceptionFilter())
   public dashboard(@Req() req:any) {
     // console.log("꺄ㅏㅏㅏㅏㅏㅏㅏ1")
     // console.log(req.user)

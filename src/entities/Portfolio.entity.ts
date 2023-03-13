@@ -11,17 +11,20 @@ export class Portfolio {
   user_id?: number;
 
   @Column()
-  coin_id?: number;
+  market?: string;
+
+  @Column('decimal', { precision: 10, scale: 8 })
+  quantity?: number;
 
   @Column()
-  quantity?: number;
+  averagePrice?: number;
+
+  @Column()
+  totalInvested?: number;
 
   @ManyToOne(() => User, (user) => user.portfolios)
   @JoinColumn({ name: 'user_id' })
   user?: User;
 
-  @OneToOne(() => Coin, (coin) => coin.portfolios)
-  @JoinColumn({ name: 'coin_id' })
-  coin?: Coin;
 
 }

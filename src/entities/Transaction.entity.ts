@@ -13,7 +13,7 @@ export class Transaction {
   @Column()
   coin_id?: number;
 
-  @Column()
+  @Column({ type: 'decimal', scale: 8 })
   quantity?: number;
 
   @Column()
