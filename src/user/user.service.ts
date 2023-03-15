@@ -23,4 +23,11 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
+  public async give500millionUser(user: User) {
+    const findUser = await this.userRepository.findOne({ where: { id: user.id } });
+    findUser.balance = findUser.balance+500000000;
+    findUser.availableBalance = findUser.availableBalance+500000000;
+    return this.userRepository.save(findUser);
+  }
+
 }

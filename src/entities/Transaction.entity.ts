@@ -13,13 +13,13 @@ export class Transaction {
   @Column()
   market?: string;
 
-  @Column({ type: 'decimal', precision: 10, scale: 8 })
+  @Column({ type: 'decimal', precision: 30, scale: 8 })
   quantity?: number;
 
-  @Column()
+  @Column({ type: 'decimal', precision: 30, scale: 8 })
   price?: number;
 
-  @Column()
+  @Column({ type: 'decimal', precision: 30, scale: 8 })
   totalPrice?: number;
 
   @Column()

@@ -1,5 +1,6 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
-import { User } from 'src/common/decorators/user.decorator';
+import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { AuthenticatedGuard } from '../auth/authenticated.guard';
+import { User } from '../common/decorators/user.decorator';
 import { CreateUserDto } from './dto/createUser.dto';
 import { UserDataDto } from './dto/userData.dto';
 import { UserService } from './user.service';
@@ -20,4 +21,11 @@ export class UserController {
   public async createUser(@Body() createUserDto: CreateUserDto) {
     return this.userService.createUser(createUserDto);
   }
+
+  @Post('/givefivemillion')
+  @UseGuards(AuthenticatedGuard)
+  public async give500millionUser(@User() user: UserDataDto) {
+    return this.userService.give500millionUser(user);
+  }
+
 }

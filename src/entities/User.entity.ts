@@ -13,10 +13,10 @@ export class User {
   @Column()
   password!: string;
 
-  @Column({default: 1000000})
+  @Column('double',{default: 1000000, precision: 30, scale: 8 })
   balance!: number;
 
-  @Column({default: 1000000})
+  @Column('double',{default: 1000000, precision: 30, scale: 8 })
   availableBalance!: number;
 
   @OneToMany(() => Transaction, (transaction) => transaction.user)

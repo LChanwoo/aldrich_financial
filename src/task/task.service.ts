@@ -72,6 +72,48 @@ export class TaskService {
       }
 
       if (transaction.transactionType === '매도') {
+        
+        if(transaction.price <= currentPrice) {
+          const user = await this.userRepository.findOne({
+            where: { id: transaction.user_id },
+            relations: ['portfolios'],
+          });
+          const portfolio = user.portfolios.find((portfolio) => portfolio.market === transaction.market);
+          if (portfolio) {
+            let averagePrice = (Number(portfolio.averagePrice) * Number(portfolio.quantity) - Number(transaction.quantity) * currentPrice) / (+portfolio.quantity - Number(transaction.quantity));
+            let quantity = Number(portfolio.quantity) - Number(transaction.quantity);
+            if(+portfolio.quantity - Number(transaction.quantity)===0){
+              averagePrice = 0;
+            }
+            if(quantity<=0){
+              await this.portfolioRepository.delete({ id: portfolio.id });
+            } else {
+              await this.portfolioRepository.update({ id: portfolio.id }, {
+                quantity: Number(portfolio.quantity) - Number(transaction.quantity),
+                averagePrice: averagePrice,
+                totalInvested: +portfolio.totalInvested - Number(transaction.quantity) * +currentPrice,
+          });
+            }
+          } else {
+            await this.portfolioRepository.save({
+              user_id: transaction.user_id,
+              market: transaction.market,
+              quantity: Number(transaction.quantity),
+              averagePrice: Number(currentPrice),
+              totalInvested: Number(transaction.quantity) * Number(currentPrice),
+            });
+          }
+          await this.userRepository.update({ id: transaction.user_id }, 
+            {
+              balance: user.balance + +transaction.quantity * currentPrice,
+              availableBalance: user.availableBalance + (user.balance + +transaction.quantity * currentPrice - user.availableBalance),
+            });
+          await this.transactionRepository.update({ id: transaction.id }, { doneAt: new Date() });
+        }
+       console.log(await this.transactionRepository.find({
+        where: { doneAt: null },
+        relations: ['user'],
+        }));
       }
 
       })

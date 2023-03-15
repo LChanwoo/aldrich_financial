@@ -13,13 +13,13 @@ export class Portfolio {
   @Column()
   market?: string;
 
-  @Column('decimal', { precision: 10, scale: 8 })
+  @Column('decimal', { precision: 30, scale: 8 })
   quantity?: number;
 
-  @Column('decimal',{default: 0})
+  @Column('double',{default: 0, precision: 30, scale: 8 })
   averagePrice?: number;
 
-  @Column('decimal',{default: 0})
+  @Column('double',{default: 0, precision: 30, scale: 8 })
   totalInvested?: number;
 
   @ManyToOne(() => User, (user) => user.portfolios)

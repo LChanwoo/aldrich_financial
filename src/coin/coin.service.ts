@@ -37,8 +37,8 @@ export class CoinService {
         where: { email: user.email },
         relations: ['transactions', 'portfolios'],
       });
-      const transactionData = userData.transactions.filter((transaction) => transaction.doneAt === null);
-      console.log(userData)
+      const transactionData = userData.transactions.filter((transaction) => transaction.doneAt === null); 
+      // console.log(userData)
       const balance = userData.balance;
       const availableBalance = userData.availableBalance;
       const portfolioData = userData.portfolios.map((portfolio) => {
@@ -116,37 +116,14 @@ export class CoinService {
 
         const balance = userData.balance;
         const availableBalance = userData.availableBalance;
-        // const coinData = JSON.parse(await this.redisService.getClient().get(body.coinName));
         const coinPrice = body.price;
         const coinAmount = body.amount;
         const totalPrice = coinPrice * coinAmount;
         if (totalPrice > availableBalance) {
           throw new BadRequestException('잔액이 부족합니다.');
         }
-        const portfolio = userData.portfolios.find((portfolio) => portfolio.market === body.coinName);
-        // if (portfolio) {
-        //   portfolio.quantity += coinAmount;
-        //   portfolio.totalInvested += totalPrice;
-        //   portfolio.averagePrice = portfolio.totalInvested / portfolio.quantity;
-          userData.availableBalance = availableBalance - totalPrice;
-
-        //   await this.entityManager.save(portfolio);
-        // } else {
-        //   const newPortfolio = this.portfolioRepository.create({
-        //     user_id: user.id,
-        //     market: body.coinName,
-        //     quantity: coinAmount,
-        //     averagePrice: coinPrice,
-        //     totalInvested: totalPrice,
-        //   });
-        //   const reduceAvailableBalance = availableBalance - totalPrice;
-        //   userData.availableBalance = reduceAvailableBalance;
-        //   userData.portfolios.push(newPortfolio);
-
-        //   await this.entityManager.save(newPortfolio);
-        // }
+        userData.availableBalance = availableBalance - totalPrice;
         await this.entityManager.save(userData);
-        // const portfolioData = await this.entityManager.findBy(Portfolio, { user_id: user.id });
         const newTransaction = this.transactionRepository.create({
           user_id: user.id,
           market: body.coinName,
@@ -157,7 +134,7 @@ export class CoinService {
         });
         await this.entityManager.save(newTransaction);
       });
-      return { message: '매수 성공' };
+      return { message: '매수 요청 성공' };
     } catch (error) {
       console.error(error);
       throw error;
@@ -248,31 +225,32 @@ export class CoinService {
   })
   } */
 
-  private async sellCoin(body: any, user: UserDataDto) {
-    // const userData = await this.userRepository.findOne({
-    //   where: { email: user.email },
-    //   relations: ['transactions', 'portfolios', 'portfolios.coin'],
-    // });
-    // const balance = userData.balance;
-    // const availableBalance = userData.availableBalance;
-    // const coinPrice = await this.redisService.getClient().get(body.coinName);
-    // const coinAmount = body.coinAmount;
-    // const totalPrice = coinPrice * coinAmount;
-    // const portfolio = userData.portfolios.find((portfolio) => portfolio.coin.name === body.coinName);
-    // if (portfolio) {
-    //   portfolio.amount -= coinAmount;
-    //   await this.userRepository.save(userData);
-    // }
-    // const newTransaction = this.userRepository.create({
-    //   coin: { name: body.coinName },
-    //   amount: coinAmount,
-    //   price: coinPrice,
-    //   type: '매도',
-    // });
-    // userData.transactions.push(newTransaction);
-    // userData.balance += totalPrice;
-    // userData.availableBalance += totalPrice;
-    // await this.userRepository.save(userData);
+  private async sellCoin(body: TransactionDto, user: UserDataDto) {
+    try {
+      await this.entityManager.transaction(async (manager) => {
+        const userData = await this.entityManager.findOne(User, {where:{ email: user.email },  relations: ['transactions', 'portfolios'] });
+        const coinPrice = body.price;
+        const coinAmount = body.amount;
+        const totalPrice = coinPrice * coinAmount;
+        await this.entityManager.save(userData);
+        const newTransaction = this.transactionRepository.create({
+          user_id: user.id,
+          market: body.coinName,
+          quantity: coinAmount,
+          price: coinPrice,
+          totalPrice: totalPrice,
+          transactionType: '매도',
+        });
+        await this.entityManager.save(newTransaction);
+      });
+      return { message: '매도 요청 성공' };
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+  public async exclude_non_concluded_transcation(userData: any){
+     return await userData.transactions.filter((transaction) => transaction.doneAt === null); 
   }
 }
 

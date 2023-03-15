@@ -11,6 +11,7 @@ import Layout from 'example/containers/Layout'
 import response, { ITableData } from 'utils/demo/tableData'
 import { ChatIcon, CartIcon, MoneyIcon, PeopleIcon } from 'icons'
 import { convertDate } from '../../utils/convertDate'
+import {numberWithCommas} from '../../utils/numberWithCommas'
 import io from 'socket.io-client';
 import axios from 'axios'
 import {
@@ -107,13 +108,17 @@ function Dashboard(coinData) {
   }
 
   const onChangeAmount = (e:any) => {
-    setAmount(e.target.value);
-    setTotalPrice(e.target.value * price);
-    if(totalPrice>balance){
-      setTotalPrice(balance)
+      const inputValue = +e.target.value;
+      setAmount(inputValue);
 
+      const newTotalPrice = inputValue * price;
 
-    }
+      if (newTotalPrice > balance) {
+        setTotalPrice(balance);
+      } else {
+        setTotalPrice(newTotalPrice);
+      }
+    
   }
 
   const onChangePrice = (e:any) => {
@@ -373,11 +378,11 @@ function Dashboard(coinData) {
         </Label> */}
         <span>수량</span>
         <Label>
-          <Input className="mt-1" placeholder="수량" value={amount.toLocaleString()} onChange={onChangeAmount} onBlur={onblurAmount} />
+          <Input className="mt-1" type="number" placeholder="수량" value={amount} onChange={onChangeAmount} onBlur={onblurAmount} />
         </Label>
         <span>가격</span>
         <Label>
-          <Input className="mt-1" placeholder="가격" value={price.toLocaleString()} onChange={onChangePrice} onBlur={onblurPrice}/>
+          <Input className="mt-1" type="number" placeholder="가격" value={price} onChange={onChangePrice} onBlur={onblurPrice}/>
         </Label>
         <span>총액</span>
         <Label>
