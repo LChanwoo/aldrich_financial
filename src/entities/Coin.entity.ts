@@ -13,7 +13,4 @@ export class Coin {
   @Column()
   price?: number;
 
-  @OneToOne(() => Transaction, (transaction) => transaction.coin)
-  transactions?: Transaction[];
-
 }

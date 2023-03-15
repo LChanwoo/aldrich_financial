@@ -13,6 +13,7 @@ import { Portfolio } from './entities/Portfolio.entity';
 import { User } from './entities/User.entity';
 import { AuthModule } from './auth/auth.module';
 import { CoinModule } from './coin/coin.module';
+import { TaskModule } from './task/task.module';
 
 @Module({
   imports: [
@@ -39,7 +40,8 @@ import { CoinModule } from './coin/coin.module';
     }),
     UserModule,
     AuthModule,
-    CoinModule
+    CoinModule,
+    TaskModule
   ],
   controllers: [AppController],
   providers: [],

@@ -10,7 +10,7 @@ import RoundIcon from 'example/components/RoundIcon'
 import Layout from 'example/containers/Layout'
 import response, { ITableData } from 'utils/demo/tableData'
 import { ChatIcon, CartIcon, MoneyIcon, PeopleIcon } from 'icons'
-import { getSession } from 'next-auth/react';
+import { convertDate } from '../../utils/convertDate'
 import io from 'socket.io-client';
 import axios from 'axios'
 import {
@@ -74,11 +74,13 @@ function Dashboard(coinData) {
   const [select,setSelect] = useState("매수")
   const [balance,setBalance] = useState(coinData.balance)
   const [availableBalance,setAvailableBalance] = useState(coinData.availableBalance)
-  const [totalPurchase, setTotalPurchase] = useState(0)
-  const [totalValue, setTotalValue] = useState (0)
-  const [gainsAndLoses,setGainsAndLoses] = useState(totalValue-totalPurchase)
-  const [profitRate,setProfitRate] = useState(100-(totalPurchase === 0 ? 100 : totalValue/totalPurchase*100))
+  const [totalPurchase, setTotalPurchase] = useState(coinData.totalPurchase)
+  const [totalValue, setTotalValue] = useState (coinData.totalEvaluated)
+  const [gainsAndLoses,setGainsAndLoses] = useState(coinData.totalGainAndLoss)
+  const [profitRate,setProfitRate] = useState(coinData.profitRate)
   const [totalAsset,setTotalAsset] = useState(balance+totalValue)
+  // console.log(coinData.transactionData)
+  console.log(coinData.portfolioData)
   // pagination setup
   const resultsPerPage = 10
   const totalResults = response.length
@@ -91,11 +93,11 @@ function Dashboard(coinData) {
   const onChangeCoin= async (e:any)=>{
     // console.log(e.currentTarget.)
     setCoin(e.currentTarget.id.replace("KRW-",""))    
-    const price = Number(e.currentTarget.childNodes[1].innerText.replace(/[^0-9.]/g, ''));
-    const amount = (balance/price).toFixed(8)
-    let totalPrice = price * amount;
+    let price = Number(e.currentTarget.childNodes[1].innerText.replace(/[^0-9.]/g, ''));
+    let amount = Number((balance/price).toFixed(8))
+    let totalPrice = price * +amount;
     while(totalPrice >balance){
-      amount = amount - 0.00000001
+      amount = +amount - 0.00000001
       totalPrice = price*amount
     }
     setAmount(amount);
@@ -131,11 +133,11 @@ function Dashboard(coinData) {
   }
   const onblurAmount = (e:any) => {
     const calAmount = balance/price;
-    setAmount(calAmount.toFixed(8));
-    setTotalPrice(price * calAmount);
+    setAmount(+(+e.target.value).toFixed(8));
+    setTotalPrice(price * amount);
   }
   const onblurPrice = (e:any) => {
-    const calPrice = calCoinPrice(price);
+    let calPrice = calCoinPrice(price);
     if(calPrice>tmpPrice){
       calPrice = tmpPrice
     }
@@ -146,6 +148,20 @@ function Dashboard(coinData) {
     } 
     setPrice(calPrice);
     setTotalPrice(totalPrice);
+  }
+  const onOrderClick = async (e:any) =>{
+    e.preventDefault();
+    const res = await axios.post('/api/order',{
+      coinName:"KRW-"+coin,
+      transactionType:select,
+      amount:amount,
+      price:price
+    })
+    if(res.status===201){
+      return location.reload();
+    }
+    return alert("주문에 실패하였습니다.")
+
   }
 
   // on page change, load new sliced data
@@ -177,13 +193,13 @@ function Dashboard(coinData) {
 
   return (
     <Layout>
-      <PageTitle>Dashboard</PageTitle>
+      <PageTitle>Aldrich Financial</PageTitle>
 
       <CTA />
 
       {/* <!-- Cards --> */}
-      <div className='grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-3'>
-          <InfoCard title="총 보유자산" value={totalAsset.toLocaleString()} className="w-1/2" >
+      <div className='grid gap-6 mb-8 md:grid-cols-1 xl:grid-cols-3'>
+          <InfoCard title="총 보유자산" value={totalAsset.toLocaleString()} className="md:w-full lg:w-1/2" >
             {/* @ts-ignore */}
             <RoundIcon
               icon={CartIcon}
@@ -212,7 +228,7 @@ function Dashboard(coinData) {
           </InfoCard>
         </div>
       <div className="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-4">
-        <InfoCard title="총매수" value={totalPurchase.toLocaleString()}>
+        <InfoCard title="총매수" value={(+totalPurchase).toLocaleString()}>
           {/* @ts-ignore */}
           <RoundIcon
             icon={PeopleIcon}
@@ -222,7 +238,7 @@ function Dashboard(coinData) {
           />
         </InfoCard>
 
-        <InfoCard title="총 평가" value={totalValue.toLocaleString()}>
+        <InfoCard title="총 평가" value={(+totalValue).toLocaleString()}>
           {/* @ts-ignore */}
           <RoundIcon
             icon={MoneyIcon}
@@ -242,7 +258,7 @@ function Dashboard(coinData) {
           />
         </InfoCard>
 
-        <InfoCard title="수익률" value={profitRate}>
+        <InfoCard title="수익률" value={profitRate +"%"}>
           {/* @ts-ignore */}
           <RoundIcon
             icon={ChatIcon}
@@ -254,7 +270,7 @@ function Dashboard(coinData) {
 
       </div>
       <div className='sm:flex sm:w-full sm:flex-row '>
-        <div className="max-w-2xl md:w-1/2 w-full min-w-max" >
+        <div className=" md:w-1/2 w-full min-w-max" >
         <TableContainer>
           <Table>
             <TableHeader>
@@ -369,15 +385,16 @@ function Dashboard(coinData) {
         </Label>
 
         <Label className="mt-6" check>
-          <Input type="checkbox" />
+          {/* <Input type="checkbox" />
           <div>
             <span className="ml-2">
               I agree to the <span className="underline"> policy</span>
             </span>
-          </div>
+          </div> */}
         </Label>
           <div className="right-0">
-            <button className="inset-y-0 right-0 px-4 text-sm font-medium leading-10 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
+            <button className="inset-y-0 right-0 px-4 text-sm font-medium leading-10 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple"
+            onClick={onOrderClick}>
               거래
             </button>
           </div>
@@ -386,37 +403,76 @@ function Dashboard(coinData) {
         <TableContainer>
           <Table>
             <TableHeader>
-              <tr className=''>
+              <tr className='w-full'>
                 <TableCell>종목</TableCell>
-                <TableCell>평가손익</TableCell>
-                <TableCell>수익률</TableCell>
-                <TableCell>보유수량</TableCell>
+                <div className='flex flex-grow'>
+                <TableCell className='flex flex-col w-full'>
+                  <TableCell align={"right"}>보유수량</TableCell>
+                  <TableCell align={"right"}>평가금액</TableCell>
+                </TableCell>  
+                <TableCell className='flex flex-col w-full'>
+                  <TableCell align={"right"}>매수평균가</TableCell>
+                  <TableCell align={"right"}>매수금액</TableCell>
+                </TableCell>
+                <TableCell className='flex flex-col w-full'>
+                  <TableCell align={"right"}>평가손익</TableCell>
+                  <TableCell align={"right"}>수익률</TableCell>
+                </TableCell>
+                </div>
               </tr>
             </TableHeader>
             <TableBody>
-            {/* {data.map((user, i) => (
-                <TableRow key={i} id={user.code} onClick={onChangeCoin}>
-                  <TableCell>
-                    <div className="flex items-center text-sm">
-                      <div>
-                        <p className="font-semibold">{user.code.replace("KRW-","")}</p>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">
-                        </p>
-                      </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <span className="text-sm">{user.trade_price.toLocaleString()} KRW</span>
-                  </TableCell>
-                  <TableCell>
-                    <Badge type={
-                      1 - user.trade_price/user.prev_closing_price > 0?'success'
-                      : 1 - user.trade_price/user.prev_closing_price < 0?'danger'
-                      : 'neutral'
-                      }>{(100 - user.trade_price/user.prev_closing_price*100).toFixed(2)}%</Badge>
-                  </TableCell>
+            {coinData.portfolioData.map((portfolio, i) => (
+                <TableRow key={i} id={portfolio.market} >
+                  <TableCell>{portfolio.market}</TableCell>
+                  <div className='flex flex-grow'>
+                    <TableCell className='flex flex-col w-full'>
+                      <TableCell align={"right"}>{(+portfolio.quantity).toLocaleString()}</TableCell>
+                      <TableCell align={"right"}>{(+portfolio.evaluatedPrice).toLocaleString()}</TableCell>
+                    </TableCell>  
+                    <TableCell className='flex flex-col w-full'>
+                      <TableCell align={"right"}>{(+portfolio.averagePrice).toLocaleString()}</TableCell>
+                      <TableCell align={"right"}>{(+portfolio.totalInvested).toLocaleString()}</TableCell>
+                    </TableCell>
+                    <TableCell className='flex flex-col w-full'>
+                      <TableCell align={"right"}>
+                        {
+                        portfolio.evaluatedGainAndLoss < 0 ?
+                        <div className={"text-red-600"}>
+                          {(+portfolio.evaluatedGainAndLoss).toLocaleString()}
+                        </div>
+                        :
+                        portfolio.evaluatedGainAndLoss == 0 ?
+                        <div > 
+                          {(+portfolio.evaluatedGainAndLoss).toLocaleString()}
+                        </div>
+                        :
+                        <div className={"text-green-700"}> 
+                          {(+portfolio.evaluatedGainAndLoss).toLocaleString()}
+                        </div>
+                      }
+                      </TableCell>
+                      <TableCell align={"right"}>
+                        {
+                        +portfolio.profitRate < 0 ?
+                        <div className={"text-red-600"}> 
+                          {(+portfolio.profitRate).toLocaleString()+"%"}
+                        </div>
+                        :
+                        +portfolio.profitRate === 0 ?
+                        <div className={""}>
+                          {(+portfolio.profitRate).toLocaleString()+"%"}
+                        </div>
+                        :
+                        <div className={"text-green-700"}>
+                          {(+portfolio.profitRate).toLocaleString()+"%"}
+                        </div>
+                      }
+                      </TableCell>
+                    </TableCell>
+                  </div>
                 </TableRow>
-              ))} */}
+              ))}
             </TableBody>
           </Table>
           <TableFooter>
@@ -441,8 +497,8 @@ function Dashboard(coinData) {
               </tr>
             </TableHeader>
             <TableBody>
-            {/* {data.map((user, i) => (
-                <TableRow key={i} id={user.code} onClick={onChangeCoin}>
+            {coinData.transactionData.map((transaction, i) => (
+                <TableRow key={i} id={transaction.market} >
                   <TableCell> 
                     <Label className="ml-6" radio>
                       <Input type="radio" value="i" name="non-trading"  />
@@ -450,34 +506,28 @@ function Dashboard(coinData) {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center text-sm">
-                      <div>
-                        <p className="font-semibold">{user.code.replace("KRW-","")}</p>
-                        <p className="text-xs text-gray-600 dark:text-gray-400">
-                        </p>
-                      </div>
+                      {transaction.market}
                     </div>
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm">{user.trade_price.toLocaleString()} KRW</span>
+                    <span className="text-sm"> {transaction.price.toLocaleString()}</span>
                   </TableCell>
                   <TableCell>
-                    <Badge type={
-                      1 - user.trade_price/user.prev_closing_price > 0?'success'
-                      : 1 - user.trade_price/user.prev_closing_price < 0?'danger'
-                      : 'neutral'
-                      }>{(100 - user.trade_price/user.prev_closing_price*100).toFixed(2)}%</Badge>
+                    <span className="text-sm"> {transaction.quantity.toLocaleString()}</span>
+                  </TableCell>
+                  <TableCell>
+                    <span className="text-sm"> {convertDate(transaction.createdAt)}</span>
                   </TableCell>
                 </TableRow>
-              ))} */}
+              ))}
             </TableBody>
           </Table>
           <TableFooter>
-            {/* <Pagination
-              totalResults={totalResults}
-              resultsPerPage={resultsPerPage}
-              label="Table navigation"
-              onChange={onPageChange}
-            /> */}
+            <div className="right-0">
+              <button className="inset-y-0 right-0 px-4 text-sm font-medium leading-10 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
+                거래취소
+              </button>
+            </div>
           </TableFooter>
         </TableContainer>
         </div>
@@ -491,11 +541,27 @@ export const getServerSideProps = async (ctx) => {
       const res = await axios.get('http://localhost:4100/api/coinPrice', {
           headers: { Cookie: ctx.req.headers.cookie },
       });
-      let {coinPrice, balance, availableBalance} = res.data
+      let {
+        coinPrice, 
+        balance, 
+        availableBalance, 
+        transactionData, 
+        portfolioData,
+        totalEvaluated,
+        totalPurchase,
+        totalGainAndLoss,
+        profitRate
+      } = res.data
       const props ={
         coinPrice,
         balance,
-        availableBalance
+        availableBalance,
+        transactionData,
+        portfolioData,
+        totalEvaluated,
+        totalPurchase,
+        totalGainAndLoss,
+        profitRate
       }
       return { props }
   }catch(e: any){

@@ -11,10 +11,13 @@ export class Transaction {
   user_id ?: number;
 
   @Column()
-  coin_id?: number;
+  market?: string;
 
-  @Column({ type: 'decimal', scale: 8 })
+  @Column({ type: 'decimal', precision: 10, scale: 8 })
   quantity?: number;
+
+  @Column()
+  price?: number;
 
   @Column()
   totalPrice?: number;
@@ -25,14 +28,11 @@ export class Transaction {
   @CreateDateColumn()
   createdAt?: Date;
 
-  @UpdateDateColumn({default:null})
-  doneAt?: Date;
+  @Column({default:null})
+  doneAt?: Date|null;
 
   @ManyToOne(() => User, (user) => user.transactions)
   @JoinColumn({name: 'user_id', referencedColumnName: 'id'})
   user?: User;
 
-  @OneToOne(() => Coin, (coin) => coin.transactions)
-  @JoinColumn({name: 'coin_id', referencedColumnName: 'id'})
-  coin?: Coin;
 }

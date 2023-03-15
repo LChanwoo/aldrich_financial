@@ -21,6 +21,9 @@ import { CoinService } from './coin.service';
 
   ],
   controllers: [CoinController],
-  providers: [CoinService]
+  providers: [CoinService],
+  exports: [CoinService,
+    TypeOrmModule,
+    RedisModule]
 })
 export class CoinModule {}

@@ -25,6 +25,7 @@ function LoginPage() {
       return window.location.href="/dashboard"
     }
     console.log(res.status)
+    return location.reload()
   }
 
   const { mode } = useContext(WindmillContext)

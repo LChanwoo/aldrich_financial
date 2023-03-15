@@ -22,4 +22,5 @@ export class UserService {
     user.password = hashedPassword;
     return this.userRepository.save(user);
   }
+
 }
