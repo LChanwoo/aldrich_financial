@@ -38,7 +38,6 @@ export class User {
     return {
       id: this.id,
       email: this.email,
-      password: this.password,
       balance: this.balance,
       availableBalance: this.availableBalance,
       transactions: this.transactions,

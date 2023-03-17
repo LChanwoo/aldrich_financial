@@ -87,9 +87,7 @@ function Dashboard(coinData) {
   const [totalAsset,setTotalAsset] = useState(balance+totalValue)
   const [portfolioData,setPortfolioDara] = useState(coinData.portfolioData)
   const [transactionData,setTransactionData] = useState(coinData.transactionData)
-  // console.log(coinData.transactionData)
-  console.log(coinData.portfolioData)
-  // pagination setup
+  const [cancleData,setCancleData] = useState("")
   const resultsPerPage = 10
   const totalResults = response.length
 
@@ -99,8 +97,14 @@ function Dashboard(coinData) {
   }
 
   const onChangeCoin= async (e:any)=>{
+
     // console.log(e.currentTarget.)
-    setCoin(e.currentTarget.id.replace("KRW-",""))    
+    setCoin(e.currentTarget.id.replace("KRW-",""))  
+    if(select==="매도"){
+      setAmount(0)
+      setPrice(e.currentTarget.childNodes[1].innerText.replace(/[^0-9.]/g, ''))
+      return setTotalPrice(0)
+    }  
     let price = Number(e.currentTarget.childNodes[1].innerText.replace(/[^0-9.]/g, ''));
     let amount = Number((balance/price).toFixed(8))
     let totalPrice = price * +amount;
@@ -141,6 +145,10 @@ function Dashboard(coinData) {
   }
 
   const onChangeSelect = (e:any) => {
+    if(e.target.value==="매도"){
+      setAmount(0)
+      setTotalPrice(0)
+    }
     setSelect(e.target.value);
   }
   const onblurAmount = (e:any) => {
@@ -163,6 +171,9 @@ function Dashboard(coinData) {
   }
   const onOrderClick = async (e:any) =>{
     e.preventDefault();
+    if(amount===0 || price===0){
+      return alert("주문 수량 또는 가격을 입력해주세요.")
+    }
     const res = await axios.post('/api/order',{
       coinName:"KRW-"+coin,
       transactionType:select,
@@ -175,6 +186,25 @@ function Dashboard(coinData) {
     return alert("주문에 실패하였습니다.")
 
   }
+  const onCancleRadioClick = (e:any) =>{
+    setCancleData(e.currentTarget.id)
+    console.log(cancleData)
+  }
+  const onCancleClick = async (e:any) =>{
+    e.preventDefault();
+    if(cancleData===""){
+      return alert("취소할 주문을 선택해주세요.")
+    }
+    const res = await axios.delete('/api/transaction',{
+      data:{
+        transactionId: cancleData
+    }})
+    if(res.status===200){
+      return location.reload(); 
+    }
+    return alert("주문 취소에 실패하였습니다.")
+  }
+
 
   // on page change, load new sliced data
   // here you would make another server request for new data
@@ -363,8 +393,8 @@ function Dashboard(coinData) {
             </span>
           </div> */}
         </Label>
-          <div className="right-0">
-            <button className="inset-y-0 right-0 px-4 text-sm font-medium leading-10 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple"
+          <div className="right-0"style={{textAlign:'right'}}  >
+            <button style={{textAlign:'right'}} className="inset-y-0 right-0 px-4 text-sm font-medium leading-10 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple"
             onClick={onOrderClick}>
               거래
             </button>
@@ -472,7 +502,7 @@ function Dashboard(coinData) {
                 <TableRow key={transaction.id} id={transaction.market} >
                   <TableCell> 
                     <Label className="ml-6" radio>
-                      <Input type="radio" id={transaction.id} name="non-trading"  />
+                      <Input type="radio" id={transaction.id} name="non-trading"  onClick={onCancleRadioClick} />
                     </Label>
                   </TableCell>
                   <TableCell>
@@ -495,7 +525,7 @@ function Dashboard(coinData) {
           </Table>
           <TableFooter>
             <div className="right-0">
-              <button className="inset-y-0 right-0 px-4 text-sm font-medium leading-10 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
+              <button onClick={onCancleClick} className="inset-y-0 right-0 px-4 text-sm font-medium leading-10 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple">
                 거래취소
               </button>
             </div>

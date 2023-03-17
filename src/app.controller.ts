@@ -70,4 +70,13 @@ export class AppController {
     return {};
   }
 
+  @Render('portfolio')
+  @Get('/portfolio')
+  @UseGuards(AuthenticatedGuard)
+  @UseFilters(new HttpExceptionFilter())
+  public portfolio() {
+    return {};
+  }
+
+
 }

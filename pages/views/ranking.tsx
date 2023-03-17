@@ -10,20 +10,27 @@ import Layout from 'example/containers/Layout'
 import { CartIcon, ChatIcon, MoneyIcon, PeopleIcon } from 'icons'
 import axios from 'axios'
 function Cards(props :any) {
+  console.log(props.ranking)
   return (
     <Layout>
-      <PageTitle>코인 뉴스</PageTitle>
+      <PageTitle>유저 순위</PageTitle>
 
       <Card className="mb-8 shadow-md">
         {
-        props.news.map((item:any) => (
+        props.ranking.map((user:any, index) => (
           <CardBody>
-            <a href={item.url}>
+            <span className='text-3xl'> {index+1}위 {user.email}</span>
+
               <p className="text-base text-gray-600 dark:text-gray-400">
-                {item.title}
+                총 매수 : {user.totalInvested.toLocaleString()}
               </p>
-            <p className="text-sm text-gray-600 dark:text-gray-400 " style={{ textAlign: 'right' }} >{item.time}</p>
-            </a>
+              <p className="text-base text-gray-600 dark:text-gray-400">
+                보유 KRW :{user.balance.toLocaleString()}
+              </p>
+              <p className="text-base text-gray-600 dark:text-gray-400">
+                종합점수 : {user.totalScore.toLocaleString()}
+              </p>
+            {/* <p className="text-sm text-gray-600 dark:text-gray-400 " style={{ textAlign: 'right' }} >{item.time}</p> */}
           </CardBody>
         ))        
         }
@@ -34,12 +41,12 @@ function Cards(props :any) {
 }
 export const getServerSideProps = async (ctx) => {
   try{
-    const res = await axios.get('http://localhost:4100/api/news',{
+    const res = await axios.get('http://localhost:4100/api/user/ranking',{
         headers: { Cookie: ctx.req.headers.cookie },
     })
     return {
       props: {
-        news: res.data.news,
+        ranking: res.data,
       },
     }
   }catch(e){

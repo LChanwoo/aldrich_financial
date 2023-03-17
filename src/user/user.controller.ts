@@ -35,8 +35,16 @@ export class UserController {
   }
 
   @Get('/ranking')
+  @UseGuards(AuthenticatedGuard)
   public async getRanking() {
     return this.userService.getRanking();
   }
+
+  @Get('/portfolioChart')
+  @UseGuards(AuthenticatedGuard)
+  public async getPortfolioChart(@User() user: UserDataDto) {
+    return this.userService.getPortfolioChartData(user);
+  }
+
   
 }
