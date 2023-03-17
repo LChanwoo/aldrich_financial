@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, HTMLAttributes } from 'react'
 import { Doughnut, Line } from 'react-chartjs-2'
 import {calCoinPrice} from '../../utils/calCoinPrice'
 import CTA from 'example/components/CTA'
@@ -12,6 +12,7 @@ import response, { ITableData } from 'utils/demo/tableData'
 import { ChatIcon, CartIcon, MoneyIcon, PeopleIcon } from 'icons'
 import { convertDate } from '../../utils/convertDate'
 import {numberWithCommas} from '../../utils/numberWithCommas'
+import {roundToFiveDecimalPlaces} from '../../utils/roundToFiveDecimalPlaces'
 import io from 'socket.io-client';
 import axios from 'axios'
 import {
@@ -51,6 +52,10 @@ import {
   Legend,
 } from 'chart.js'
 import SectionTitle from 'example/components/Typography/SectionTitle'
+interface HTMLDivElementWithAlign extends HTMLAttributes<HTMLDivElement> {
+  align?: string;
+}
+
 
 function Dashboard(coinData) {
   // console.log(coindData.coinData.coinPrice)
@@ -80,6 +85,8 @@ function Dashboard(coinData) {
   const [gainsAndLoses,setGainsAndLoses] = useState(coinData.totalGainAndLoss)
   const [profitRate,setProfitRate] = useState(coinData.profitRate)
   const [totalAsset,setTotalAsset] = useState(balance+totalValue)
+  const [portfolioData,setPortfolioDara] = useState(coinData.portfolioData)
+  const [transactionData,setTransactionData] = useState(coinData.transactionData)
   // console.log(coinData.transactionData)
   console.log(coinData.portfolioData)
   // pagination setup
@@ -200,11 +207,11 @@ function Dashboard(coinData) {
     <Layout>
       <PageTitle>Aldrich Financial</PageTitle>
 
-      <CTA />
+      {/* <CTA /> */}
 
       {/* <!-- Cards --> */}
-      <div className='grid gap-6 mb-8 md:grid-cols-1 xl:grid-cols-3'>
-          <InfoCard title="총 보유자산" value={totalAsset.toLocaleString()} className="md:w-full lg:w-1/2" >
+      <div className='grid gap-3 mb-8 md:grid-cols-1 xl:grid-cols-3'>
+          <InfoCard title="총 보유자산" value={roundToFiveDecimalPlaces(totalAsset).toLocaleString()} className="md:w-full lg:w-1/2" >
             {/* @ts-ignore */}
             <RoundIcon
               icon={CartIcon}
@@ -213,7 +220,7 @@ function Dashboard(coinData) {
               className="mr-4"
             />
           </InfoCard>
-          <InfoCard title="보유KRW" value={balance.toLocaleString()} className="w-1/2">
+          <InfoCard title="보유KRW" value={roundToFiveDecimalPlaces(balance).toLocaleString()} className="w-1/2">
             {/* @ts-ignore */}
             <RoundIcon
               icon={CartIcon}
@@ -222,7 +229,7 @@ function Dashboard(coinData) {
               className="mr-4 "
             />
           </InfoCard>
-          <InfoCard title="가용KRW" value={availableBalance.toLocaleString()} className="w-1/2">
+          <InfoCard title="가용KRW" value={roundToFiveDecimalPlaces(availableBalance).toLocaleString()} className="w-1/2">
             {/* @ts-ignore */}
             <RoundIcon
               icon={CartIcon}
@@ -232,8 +239,8 @@ function Dashboard(coinData) {
             />
           </InfoCard>
         </div>
-      <div className="grid gap-6 mb-8 md:grid-cols-2 xl:grid-cols-4">
-        <InfoCard title="총매수" value={(+totalPurchase).toLocaleString()}>
+      <div className="grid gap-3 mb-8 md:grid-cols-1 xl:grid-cols-4">
+        <InfoCard title="총매수" value={roundToFiveDecimalPlaces((+totalPurchase)).toLocaleString()}>
           {/* @ts-ignore */}
           <RoundIcon
             icon={PeopleIcon}
@@ -243,7 +250,7 @@ function Dashboard(coinData) {
           />
         </InfoCard>
 
-        <InfoCard title="총 평가" value={(+totalValue).toLocaleString()}>
+        <InfoCard title="총 평가" value={roundToFiveDecimalPlaces((+totalValue)).toLocaleString()}>
           {/* @ts-ignore */}
           <RoundIcon
             icon={MoneyIcon}
@@ -253,7 +260,7 @@ function Dashboard(coinData) {
           />
         </InfoCard>
 
-        <InfoCard title="평가손익" value={gainsAndLoses.toLocaleString()}>
+        <InfoCard title="평가손익" value={roundToFiveDecimalPlaces(+gainsAndLoses).toLocaleString()}>
           {/* @ts-ignore */}
           <RoundIcon
             icon={CartIcon}
@@ -275,7 +282,7 @@ function Dashboard(coinData) {
 
       </div>
       <div className='sm:flex sm:w-full sm:flex-row '>
-        <div className=" md:w-1/2 w-full min-w-max" >
+        <div className=" lg:w-1/2 w-full " >
         <TableContainer>
           <Table>
             <TableHeader>
@@ -312,29 +319,17 @@ function Dashboard(coinData) {
             </TableBody>
           </Table>
           <TableFooter>
-            {/* <Pagination
-              totalResults={totalResults}
-              resultsPerPage={resultsPerPage}
-              label="Table navigation"
-              onChange={onPageChange}
-            /> */}
           </TableFooter>
         </TableContainer>
         </div>
-        <div className='max-w-2xl md:w-1/2 w-full min-w-max m-3'>
+        <div className='max-w-xl md:w-1/2 w-full sm:m-3'>
           <PageTitle>주문</PageTitle>
           <div className="px-4 py-3 mb-8 bg-white rounded-lg shadow-md dark:bg-gray-800">
         <Label>
           <Input className="mt-1" value={coin} readOnly/>
         </Label>
 
-        {/* <Label className="mt-4">
-          <Input disabled className="mt-1" placeholder="주문가" />
-        </Label> */}
-
         <div className="mt-4">
-          {/* TODO: Check if this label is accessible, or fallback */}
-          {/* <span className="text-sm text-gray-700 dark:text-gray-400">Account Type</span> */}
           <div className="mt-2">
             <Label radio>
               <Input type="radio" value="매수" name="accountType" onClick={onChangeSelect} defaultChecked />
@@ -344,41 +339,12 @@ function Dashboard(coinData) {
               <Input type="radio" value="매도" name="accountType" onClick={onChangeSelect} />
               <span className="ml-2">매도</span>
             </Label>
-            {/* <Label disabled className="ml-6" radio>
-              <Input disabled type="radio" value="disabled" name="accountType" />
-              <span className="ml-2">Disabled</span>
-            </Label> */}
+
           </div>
         </div>
-
-        {/* <Label className="mt-4">
-          <span>Requested Limit</span>
-          <Select className="mt-1">
-            <option>$1,000</option>
-            <option>$5,000</option>
-            <option>$10,000</option>
-            <option>$25,000</option>
-          </Select>
-        </Label>
-
-        <Label className="mt-4">
-          <span>Multiselect</span>
-          <Select className="mt-1" multiple>
-            <option>Option 1</option>
-            <option>Option 2</option>
-            <option>Option 3</option>
-            <option>Option 4</option>
-            <option>Option 5</option>
-          </Select>
-        </Label> */}
-
-        {/* <Label className="mt-4">
-          <span>Message</span>
-          <Textarea className="mt-1" rows={3} placeholder="Enter some long form content." />
-        </Label> */}
         <span>수량</span>
         <Label>
-          <Input className="mt-1" type="number" placeholder="수량" value={amount} onChange={onChangeAmount} onBlur={onblurAmount} />
+          <Input className="mt-1" type="number" placeholder="수량" value={parseFloat(amount.toFixed(8))} onChange={onChangeAmount} onBlur={onblurAmount} />
         </Label>
         <span>가격</span>
         <Label>
@@ -410,37 +376,37 @@ function Dashboard(coinData) {
             <TableHeader>
               <tr className='w-full'>
                 <TableCell>종목</TableCell>
-                <div className='flex flex-grow'>
-                <TableCell className='flex flex-col w-full'>
-                  <TableCell align={"right"}>보유수량</TableCell>
-                  <TableCell align={"right"}>평가금액</TableCell>
-                </TableCell>  
-                <TableCell className='flex flex-col w-full'>
-                  <TableCell align={"right"}>매수평균가</TableCell>
-                  <TableCell align={"right"}>매수금액</TableCell>
+                <TableCell className='flex flex-grow'>
+                  <div className='flex flex-col w-full'>
+                    <div style={{ textAlign: 'right' }}  className="m-1" >보유수량</div>
+                    <div style={{ textAlign: 'right' }}  className="m-1">평가금액</div>
+                  </div>   
+                  <div className='flex flex-col w-full'>
+                    <div style={{ textAlign: 'right' }}  className="m-1">매수평균가</div>
+                    <div style={{ textAlign: 'right' }}  className="m-1">매수금액</div>
+                  </div>
+                  <div className='flex flex-col w-full'>
+                    <div style={{ textAlign: 'right' }}  className="m-1">평가손익</div>
+                    <div style={{ textAlign: 'right' }} className="m-1">수익률</div>
+                  </div> 
                 </TableCell>
-                <TableCell className='flex flex-col w-full'>
-                  <TableCell align={"right"}>평가손익</TableCell>
-                  <TableCell align={"right"}>수익률</TableCell>
-                </TableCell>
-                </div>
               </tr>
             </TableHeader>
             <TableBody>
-            {coinData.portfolioData.map((portfolio, i) => (
+             {portfolioData.map((portfolio, i) => (
                 <TableRow key={i} id={portfolio.market} >
-                  <TableCell>{portfolio.market}</TableCell>
-                  <div className='flex flex-grow'>
-                    <TableCell className='flex flex-col w-full'>
-                      <TableCell align={"right"}>{(+portfolio.quantity).toLocaleString()}</TableCell>
-                      <TableCell align={"right"}>{(+portfolio.evaluatedPrice).toLocaleString()}</TableCell>
-                    </TableCell>  
-                    <TableCell className='flex flex-col w-full'>
-                      <TableCell align={"right"}>{(+portfolio.averagePrice).toLocaleString()}</TableCell>
-                      <TableCell align={"right"}>{(+portfolio.totalInvested).toLocaleString()}</TableCell>
-                    </TableCell>
-                    <TableCell className='flex flex-col w-full'>
-                      <TableCell align={"right"}>
+                  <TableCell className='text-xs lg:text-base'>{portfolio.market}</TableCell>
+                  <TableCell className='flex flex-grow text-xs lg:text-base'>
+                    <div className='flex flex-col w-full'>
+                      <div style={{ textAlign: 'right' }}  className="m-1">{((+portfolio.quantity).toFixed(8)).toLocaleString()}</div>
+                      <div style={{ textAlign: 'right' }}  className="m-1">{(+portfolio.evaluatedPrice).toLocaleString()}</div>
+                    </div>  
+                    <div className='flex flex-col w-full'>
+                      <div style={{ textAlign: 'right' }}  className="m-1">{(+portfolio.averagePrice).toLocaleString()}</div>
+                      <div style={{ textAlign: 'right' }}  className="m-1">{(+portfolio.totalInvested).toLocaleString()}</div>
+                    </div>
+                    <div className='flex flex-col w-full'>
+                      <div style={{ textAlign: 'right' }}  className="m-1">
                         {
                         portfolio.evaluatedGainAndLoss < 0 ?
                         <div className={"text-red-600"}>
@@ -456,8 +422,8 @@ function Dashboard(coinData) {
                           {(+portfolio.evaluatedGainAndLoss).toLocaleString()}
                         </div>
                       }
-                      </TableCell>
-                      <TableCell align={"right"}>
+                      </div>
+                      <div style={{ textAlign: 'right' }}  className="m-1">
                         {
                         +portfolio.profitRate < 0 ?
                         <div className={"text-red-600"}> 
@@ -473,11 +439,11 @@ function Dashboard(coinData) {
                           {(+portfolio.profitRate).toLocaleString()+"%"}
                         </div>
                       }
-                      </TableCell>
-                    </TableCell>
-                  </div>
+                      </div>
+                    </div>
+                  </TableCell> 
                 </TableRow>
-              ))}
+              ))} 
             </TableBody>
           </Table>
           <TableFooter>
@@ -493,7 +459,7 @@ function Dashboard(coinData) {
         <TableContainer>
           <Table>
             <TableHeader>
-              <tr className=''>
+              <tr className='text-xs lg:text-base'>
                 <TableCell> </TableCell>
                 <TableCell>종목</TableCell>
                 <TableCell>주문가격</TableCell>
@@ -502,11 +468,11 @@ function Dashboard(coinData) {
               </tr>
             </TableHeader>
             <TableBody>
-            {coinData.transactionData.map((transaction, i) => (
-                <TableRow key={i} id={transaction.market} >
+            {transactionData.map((transaction, i) => (
+                <TableRow key={transaction.id} id={transaction.market} >
                   <TableCell> 
                     <Label className="ml-6" radio>
-                      <Input type="radio" value="i" name="non-trading"  />
+                      <Input type="radio" id={transaction.id} name="non-trading"  />
                     </Label>
                   </TableCell>
                   <TableCell>
@@ -515,10 +481,10 @@ function Dashboard(coinData) {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm"> {transaction.price.toLocaleString()}</span>
+                    <span className="text-sm"> {(+transaction.price).toLocaleString()}</span>
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm"> {transaction.quantity.toLocaleString()}</span>
+                    <span className="text-sm"> {+transaction.quantity.toLocaleString()}</span>
                   </TableCell>
                   <TableCell>
                     <span className="text-sm"> {convertDate(transaction.createdAt)}</span>

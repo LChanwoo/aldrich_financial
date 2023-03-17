@@ -30,4 +30,36 @@ export class UserService {
     return this.userRepository.save(findUser);
   }
 
+  public async getUserData(userData: User) {
+    const userInfo = await this.userRepository.findOne({
+      where: { email: userData.email },
+      relations: ['transactions', 'portfolios'],
+    });
+    if (userInfo) {
+      console.log(userInfo.totalInvested); // 모든 포트폴리오의 totalInvested 합산 값
+    }
+    return userInfo;
+  }   
+  public async getRanking() {
+    const ranking = await this.userRepository.find({relations: ['transactions', 'portfolios'],});
+    const sorted = ranking.sort((a, b) => {
+      console.log(a.totalScore, b.totalScore)
+      if(a.totalScore !== b.totalScore){
+        return b.totalScore - a.totalScore;
+      }
+      if(a.totalInvested !== b.totalInvested){
+        return b.totalInvested - a.totalInvested;
+      }
+      if(a.balance !== b.balance){
+        return b.balance - a.balance;
+      }
+      return 0;
+    });
+    const map = sorted.map((user, index) => {
+      const {password,...removePassword} = user.toObject()
+      return removePassword;
+    });
+    console.log(map)
+    return map;
+  }
 }

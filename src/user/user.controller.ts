@@ -28,4 +28,15 @@ export class UserController {
     return this.userService.give500millionUser(user);
   }
 
+  @Get('/userdata')
+  @UseGuards(AuthenticatedGuard)
+  public async getUserData(@User() user: UserDataDto) {
+    return this.userService.getUserData(user);
+  }
+
+  @Get('/ranking')
+  public async getRanking() {
+    return this.userService.getRanking();
+  }
+  
 }

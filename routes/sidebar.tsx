@@ -27,18 +27,23 @@ const routes: IRoute[] = [
   {
     path: '/dashboard', // the url
     icon: 'HomeIcon', // the component being exported from icons/index.js
-    name: 'Dashboard', // name that appear in Sidebar
+    name: '대쉬보드', // name that appear in Sidebar
     exact: true,
   },
   {
-    path: '/example/forms',
-    icon: 'FormsIcon',
-    name: 'Forms',
+    path: '/ranking',
+    icon: 'CardsIcon',
+    name: '투자순위',
   },
   {
-    path: '/example/cards',
+    path: '/news',
     icon: 'CardsIcon',
-    name: 'Cards',
+    name: '코인뉴스',
+  },
+  {
+    path: '/news',
+    icon: 'FormsIcon',
+    name: 'Forms',
   },
   {
     path: '/example/charts',

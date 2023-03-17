@@ -32,7 +32,7 @@ export class TaskService {
       .leftJoinAndSelect('transaction.user', 'user')
       .where('transaction.doneAt IS NULL')
       .getMany();
-    console.log(transactionData)
+    // console.log(transactionData)
     transactionData.forEach(async (transaction) => {
       const currentPrice = JSON.parse(await this.redis.getClient().get(transaction.market)).trade_price;
       await this.entityManager.transaction(async (transactionManager) => {
@@ -65,10 +65,10 @@ export class TaskService {
             });
           await this.transactionRepository.update({ id: transaction.id }, { doneAt: new Date() });
         }
-       console.log(await this.transactionRepository.find({
-        where: { doneAt: null },
-        relations: ['user'],
-        }));
+      //  console.log(await this.transactionRepository.find({
+      //   where: { doneAt: null },
+      //   relations: ['user'],
+      //   }));
       }
 
       if (transaction.transactionType === '매도') {
@@ -85,6 +85,7 @@ export class TaskService {
             if(+portfolio.quantity - Number(transaction.quantity)===0){
               averagePrice = 0;
             }
+            console.log(averagePrice,quantity)
             if(quantity<=0){
               await this.portfolioRepository.delete({ id: portfolio.id });
             } else {
@@ -110,15 +111,15 @@ export class TaskService {
             });
           await this.transactionRepository.update({ id: transaction.id }, { doneAt: new Date() });
         }
-       console.log(await this.transactionRepository.find({
-        where: { doneAt: null },
-        relations: ['user'],
-        }));
+      //  console.log(await this.transactionRepository.find({
+      //   where: { doneAt: null },
+      //   relations: ['user'],
+      //   }));
       }
 
       })
     // console.log(transactionData)
-    console.log('cron job is running every second');
+    // console.log('cron job is running every second');
     })
   }
 

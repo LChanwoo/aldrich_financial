@@ -8,6 +8,7 @@ import { AuthenticatedGuard } from '../auth/authenticated.guard';
 import { TransactionDto } from './dto/transaction.dto';
 import { UserDataDto } from '../user/dto/userData.dto';
 import { HttpExceptionFilter } from '../common/filters/http-exception.filter';
+import { DeleteTransactionDto } from './dto/deleteTransaction.dto';
 
 @Controller('')
 export class CoinController {
@@ -31,6 +32,11 @@ export class CoinController {
   @Delete('/api/userdata')
   public async deleteUserData(@User() user:UserDataDto) {
     return this.coinService.deleteUserData(user);
+  }
+
+  @Delete('/api/transaction')
+  public async deleteTransaction(@Body() body :DeleteTransactionDto, @User() user:UserDataDto) {
+    return this.coinService.delete_non_concluded_transcation(body,user);
   }
 }
 

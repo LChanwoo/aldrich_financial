@@ -25,4 +25,26 @@ export class User {
   @OneToMany(() => Portfolio, (portfolio) => portfolio.user)
   portfolios?: Portfolio[];
 
+
+  get totalInvested(): number {
+    return this.portfolios?.reduce((total, portfolio) => total + (portfolio.totalInvested || 0), 0) || 0;
+  }
+
+  get totalScore(): number {
+    return this.portfolios?.reduce((total, portfolio) => total + (portfolio.totalInvested || 0), 0) +this.balance || 0;
+  }
+
+  toObject(): any {
+    return {
+      id: this.id,
+      email: this.email,
+      password: this.password,
+      balance: this.balance,
+      availableBalance: this.availableBalance,
+      transactions: this.transactions,
+      portfolios: this.portfolios,
+      totalInvested: this.totalInvested,
+      totalScore: this.totalScore,
+    };
+  }
 }

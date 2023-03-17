@@ -13,7 +13,7 @@ export class Portfolio {
   @Column()
   market?: string;
 
-  @Column('decimal', { precision: 30, scale: 8 })
+  @Column('double', { precision: 30, scale: 8 })
   quantity?: number;
 
   @Column('double',{default: 0, precision: 30, scale: 8 })

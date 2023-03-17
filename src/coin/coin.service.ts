@@ -11,6 +11,7 @@ import { Transaction } from '../entities/Transaction.entity';
 import { Portfolio } from '../entities/Portfolio.entity';
 import { UserDataDto } from '../user/dto/userData.dto';
 import { ConnectedSocket } from '@nestjs/websockets';
+import { DeleteTransactionDto } from './dto/deleteTransaction.dto';
 
 @Injectable()
 export class CoinService {
@@ -42,17 +43,18 @@ export class CoinService {
       const balance = userData.balance;
       const availableBalance = userData.availableBalance;
       const portfolioData = userData.portfolios.map((portfolio) => {
-        const currentPrice = JSON.parse(coinPrice[marketData.indexOf(portfolio.market)]).trade_price;
-        return {
-          market: portfolio.market,
-          quantity: portfolio.quantity,
-          averagePrice: portfolio.averagePrice,
-          totalInvested: portfolio.totalInvested,
-          currentPrice: currentPrice,
-          profitRate: ((currentPrice - portfolio.averagePrice) / portfolio.averagePrice * 100).toFixed(2),
-          evaluatedPrice: (portfolio.quantity * currentPrice).toFixed(8),
-          evaluatedGainAndLoss: +((portfolio.quantity * currentPrice) - portfolio.totalInvested).toFixed(8),
-        }
+          const currentPrice = JSON.parse(coinPrice[marketData.indexOf(portfolio.market)]).trade_price;
+          const evaluatedPrice = +(portfolio.quantity * currentPrice).toFixed(8);
+          return {
+            market: portfolio.market,
+            quantity: portfolio.quantity,
+            averagePrice: portfolio.averagePrice,
+            totalInvested: portfolio.totalInvested,
+            currentPrice: currentPrice,
+            profitRate: ((1-portfolio.totalInvested/evaluatedPrice)*100).toFixed(2),
+            evaluatedPrice: evaluatedPrice,
+            evaluatedGainAndLoss: +((portfolio.quantity * currentPrice) - portfolio.totalInvested).toFixed(8),
+          }
       })
       const totalPurchase = portfolioData.reduce((acc,cur)=> acc+ +cur.totalInvested,0)
       const totalEvaluated = portfolioData.reduce((acc,cur)=>acc+ +cur.evaluatedPrice,0)
@@ -99,22 +101,7 @@ export class CoinService {
   async purchaseCoin(body: TransactionDto, user: UserDataDto) {
     try {
       await this.entityManager.transaction(async (manager) => {
-        // console.log('body', body);
-        // 이전 데이터 삭제
-        /* const deletePortfolio = await this.entityManager.findOneBy(Portfolio, { user_id: user.id, market: body.coinName });
-        if (deletePortfolio) {
-          const res = await this.entityManager.delete(Portfolio, { id: deletePortfolio.id });
-          console.log(res);
-        } */
-        // 시작
         const userData = await this.entityManager.findOne(User, {where:{ email: user.email },  relations: ['transactions', 'portfolios'] });
-        console.log("sssss", userData)
-        // 이전 데이터 복구
-
-        // const portfolioall = await this.entityManager.findBy(Portfolio, { user_id: userData.id });
-        // console.log(portfolioall);
-
-        const balance = userData.balance;
         const availableBalance = userData.availableBalance;
         const coinPrice = body.price;
         const coinAmount = body.amount;
@@ -140,90 +127,6 @@ export class CoinService {
       throw error;
     }
   }
- /*  private async purchaseCoin(body: TransactionDto, user: UserDataDto) {
-    await this.entityManager.transaction(async manager =>{
-    try{
-      console.log("body",body)
-      //이전 데이터 삭제
-      const deletePortfolio = await this.portfolioRepository.findOne({
-        where: { user_id: user.id, market: body.coinName },
-      });
-      if(deletePortfolio){
-        const res=await this.portfolioRepository.delete({id:deletePortfolio.id});
-        console.log(res)
-      }
-      // 시작
-      const userData = await this.userRepository.findOne({
-        where: { email: user.email },
-        relations: ['transactions', 'portfolios'],
-      });
-      // 이전 데이터 복구
-      userData.availableBalance = userData.balance;
-      
-      await this.userRepository.save(userData);
-      const portfolioall = await this.portfolioRepository.find({
-        where: { user_id: userData.id },
-      });
-      console.log(portfolioall)
-      const balance = userData.balance;
-      const availableBalance = userData.availableBalance;
-      const coinData = JSON.parse(await this.redisService.getClient().get(body.coinName))
-      const coinPrice = body.price;
-      const coinAmount = body.amount;
-      const totalPrice = coinPrice * coinAmount;
-      if(totalPrice>availableBalance){
-        return new HttpException('잔액이 부족합니다.', 400);
-      }
-      const portfolio = userData.portfolios.find((portfolio) => portfolio.market === body.coinName);
-      console.log(portfolio)
-      if (portfolio) {
-        portfolio.quantity += coinAmount;
-        portfolio.totalInvested += totalPrice;
-        portfolio.averagePrice = portfolio.totalInvested / portfolio.quantity;
-        userData.availableBalance = availableBalance - totalPrice;
-
-        await this.portfolioRepository.save(portfolio);
-        await this.userRepository.save(userData);
-      } else {
-        const newPortfolio = this.portfolioRepository.create({
-          user_id: user.id,
-          market: body.coinName,
-          quantity: coinAmount,
-          averagePrice: coinPrice,
-          totalInvested: totalPrice,
-        });
-        const reduceAvailableBalance = availableBalance - totalPrice;
-        userData.availableBalance = reduceAvailableBalance;
-        userData.portfolios.push(newPortfolio);
-        const res1=await this.portfolioRepository.save(newPortfolio);
-        const res =await this.userRepository.save(userData);
-      }
-      const newUserData = await this.userRepository.findOne({
-        where: { email: user.email },
-        relations: ['transactions', 'portfolios'],
-      });
-
-      const portfolioData = await this.portfolioRepository.find({
-        where: { user_id: user.id },
-      });
-      console.log(portfolioData)
-      // return newUserData;
-      const newTransaction = this.transactionRepository.create({
-        user_id: user.id,
-        market: body.coinName,
-        quantity: coinAmount,
-        price: coinPrice,
-        totalPrice: totalPrice,
-        transactionType: '매수',
-      });
-      const res = await this.transactionRepository.save(newTransaction);
-
-    }catch(e){
-      console.log(e)
-    }
-    return new HttpException('잘못된 요청입니다.', 400);
-  })
-  } */
 
   private async sellCoin(body: TransactionDto, user: UserDataDto) {
     try {
@@ -249,8 +152,26 @@ export class CoinService {
       throw error;
     }
   }
-  public async exclude_non_concluded_transcation(userData: any){
+  public async exclude_non_concluded_transcation(userData: UserDataDto){
      return await userData.transactions.filter((transaction) => transaction.doneAt === null); 
+  }
+
+  public async delete_non_concluded_transcation(body : DeleteTransactionDto ,userData: UserDataDto){
+    const userInfo = await this.userRepository.findOne({
+      where: { email: userData.email },
+      relations: ['transactions', 'portfolios'],
+    });
+    console.log(userInfo)
+    await this.entityManager.transaction(async (manager) => {
+      const deleteTransaction = await manager.findOne(Transaction, {where:{ user_id: userData.id, id:body.transactionId, doneAt: null }});
+      if(deleteTransaction){
+        const user = await manager.update(User, {id:userData.id}, {availableBalance: +userInfo.availableBalance + +deleteTransaction.totalPrice})
+        const res=await this.transactionRepository.delete({id:body.transactionId});
+        console.log(res)
+      }else {
+        throw new BadRequestException('삭제할 수 없습니다.');
+      }
+    })
   }
 }
 
