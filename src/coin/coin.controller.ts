@@ -17,14 +17,14 @@ export class CoinController {
   ) {}
 
   @Get('/api/coinPrice')
-  @UseGuards(AuthenticatedGuard)
+  // @UseGuards(AuthenticatedGuard)
   public async coinPrice(@Req() req:any) {
     return this.coinService.coinPrice(req.user);
   }
 
   @Post('/api/order')
   @UseFilters(new HttpExceptionFilter())
-  @UseGuards(AuthenticatedGuard)
+  // @UseGuards(AuthenticatedGuard)
   public async order(@Body() transactionDto: TransactionDto ,@User() user:UserDataDto){
     return this.coinService.order(transactionDto, user);
   }

@@ -12,6 +12,7 @@ import { Portfolio } from '../entities/Portfolio.entity';
 import { UserDataDto } from '../user/dto/userData.dto';
 import { ConnectedSocket } from '@nestjs/websockets';
 import { DeleteTransactionDto } from './dto/deleteTransaction.dto';
+import { roundToFiveDecimalPlaces } from '../../utils/roundToFiveDecimalPlaces';
 
 @Injectable()
 export class CoinService {
@@ -44,7 +45,7 @@ export class CoinService {
       const availableBalance = userData.availableBalance;
       const portfolioData = userData.portfolios.map((portfolio) => {
           const currentPrice = JSON.parse(coinPrice[marketData.indexOf(portfolio.market)]).trade_price;
-          const evaluatedPrice = +(portfolio.quantity * currentPrice).toFixed(8);
+          const evaluatedPrice = roundToFiveDecimalPlaces(+(portfolio.quantity * currentPrice));
           return {
             market: portfolio.market,
             quantity: portfolio.quantity,
@@ -101,7 +102,7 @@ export class CoinService {
   async purchaseCoin(body: TransactionDto, user: UserDataDto) {
     try {
       await this.entityManager.transaction(async (manager) => {
-        const userData = await this.entityManager.findOne(User, {where:{ email: user.email },  relations: ['transactions', 'portfolios'] });
+        const userData = await manager.findOne(User, {where:{ email: user.email },  relations: ['transactions', 'portfolios'] });
         const availableBalance = userData.availableBalance;
         const coinPrice = body.price;
         const coinAmount = body.amount;
@@ -110,7 +111,7 @@ export class CoinService {
           throw new BadRequestException('잔액이 부족합니다.');
         }
         userData.availableBalance = availableBalance - totalPrice;
-        await this.entityManager.save(userData);
+        await manager.save(userData);
         const newTransaction = this.transactionRepository.create({
           user_id: user.id,
           market: body.coinName,
@@ -119,7 +120,7 @@ export class CoinService {
           totalPrice: totalPrice,
           transactionType: '매수',
         });
-        await this.entityManager.save(newTransaction);
+        await manager.save(newTransaction);
       });
       return { message: '매수 요청 성공' };
     } catch (error) {

@@ -138,8 +138,8 @@ function Dashboard(coinData) {
       p = p.replace(",","")
       console.log(p)
     }
-    if(p>tmpPrice) p = tmpPrice
-    console.log(tmpPrice)
+    // if(p>tmpPrice) p = tmpPrice
+    // console.log(tmpPrice)
     setPrice(p);
     setTotalPrice(p * amount);
   }
@@ -158,14 +158,14 @@ function Dashboard(coinData) {
   }
   const onblurPrice = (e:any) => {
     let calPrice = calCoinPrice(price);
-    if(calPrice>tmpPrice){
-      calPrice = tmpPrice
-    }
+    // if(calPrice>tmpPrice){
+    //   calPrice = tmpPrice
+    // }
     let totalPrice = calPrice *amount
-    if(totalPrice>balance){
-      const amount = (balance/calPrice)
-      setAmount(amount)
-    } 
+    // if(totalPrice>balance){
+    //   const amount = (balance/calPrice)
+    //   setAmount(amount)
+    // } 
     setPrice(calPrice);
     setTotalPrice(totalPrice);
   }
@@ -428,7 +428,7 @@ function Dashboard(coinData) {
                   <TableCell className='text-xs lg:text-base'>{portfolio.market}</TableCell>
                   <TableCell className='flex flex-grow text-xs lg:text-base'>
                     <div className='flex flex-col w-full'>
-                      <div style={{ textAlign: 'right' }}  className="m-1">{((+portfolio.quantity).toFixed(8)).toLocaleString()}</div>
+                      <div style={{ textAlign: 'right' }}  className="m-1">{((+portfolio.quantity)).toLocaleString()}</div>
                       <div style={{ textAlign: 'right' }}  className="m-1">{(+portfolio.evaluatedPrice).toLocaleString()}</div>
                     </div>  
                     <div className='flex flex-col w-full'>
@@ -514,7 +514,7 @@ function Dashboard(coinData) {
                     <span className="text-sm"> {(+transaction.price).toLocaleString()}</span>
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm"> {+transaction.quantity.toLocaleString()}</span>
+                    <span className="text-sm"> {(+transaction.quantity).toLocaleString()}</span>
                   </TableCell>
                   <TableCell>
                     <span className="text-sm"> {convertDate(transaction.createdAt)}</span>
