@@ -60,8 +60,8 @@ export class TaskService {
           }
           await this.userRepository.update({ id: transaction.user_id }, 
             {
-              balance: user.balance - +transaction.quantity * currentPrice,
-              availableBalance: user.availableBalance + (user.balance - +transaction.quantity * currentPrice - user.availableBalance),
+              balance: +user.balance - +transaction.quantity * +currentPrice,
+              availableBalance: +user.availableBalance + (+user.balance - +transaction.quantity * currentPrice - +user.availableBalance),
             });
           await this.transactionRepository.update({ id: transaction.id }, { doneAt: new Date() });
         }

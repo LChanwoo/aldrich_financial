@@ -13,6 +13,8 @@ import { ChatIcon, CartIcon, MoneyIcon, PeopleIcon } from 'icons'
 import { convertDate } from '../../utils/convertDate'
 import {numberWithCommas} from '../../utils/numberWithCommas'
 import {roundToFiveDecimalPlaces} from '../../utils/roundToFiveDecimalPlaces'
+import {roundToNineDecimalPlaces} from '../../utils/roundToNineDecimalPlaces'
+
 import io from 'socket.io-client';
 import axios from 'axios'
 import {
@@ -55,7 +57,7 @@ import SectionTitle from 'example/components/Typography/SectionTitle'
 interface HTMLDivElementWithAlign extends HTMLAttributes<HTMLDivElement> {
   align?: string;
 }
-
+const localeStringOptions = { minimumFractionDigits: 0, maximumFractionDigits: 8 };
 
 function Dashboard(coinData) {
   // console.log(coindData.coinData.coinPrice)
@@ -84,7 +86,7 @@ function Dashboard(coinData) {
   const [totalValue, setTotalValue] = useState (coinData.totalEvaluated)
   const [gainsAndLoses,setGainsAndLoses] = useState(coinData.totalGainAndLoss)
   const [profitRate,setProfitRate] = useState(coinData.profitRate)
-  const [totalAsset,setTotalAsset] = useState(balance+totalValue)
+  const [totalAsset,setTotalAsset] = useState(+balance+ +totalValue)
   const [portfolioData,setPortfolioDara] = useState(coinData.portfolioData)
   const [transactionData,setTransactionData] = useState(coinData.transactionData)
   const [cancleData,setCancleData] = useState("")
@@ -157,22 +159,20 @@ function Dashboard(coinData) {
     setTotalPrice(price * amount);
   }
   const onblurPrice = (e:any) => {
-    let calPrice = calCoinPrice(price);
-    // if(calPrice>tmpPrice){
-    //   calPrice = tmpPrice
-    // }
+    let calPrice = roundToNineDecimalPlaces(calCoinPrice(price));
     let totalPrice = calPrice *amount
-    // if(totalPrice>balance){
-    //   const amount = (balance/calPrice)
-    //   setAmount(amount)
-    // } 
-    setPrice(calPrice);
+    setPrice( calPrice);
     setTotalPrice(totalPrice);
   }
   const onOrderClick = async (e:any) =>{
     e.preventDefault();
+    
     if(amount===0 || price===0){
       return alert("주문 수량 또는 가격을 입력해주세요.")
+    }
+
+    if(amount*price<5000){
+      return alert("최소 주문 금액은 5,000원 입니다.")
     }
     const res = await axios.post('/api/order',{
       coinName:"KRW-"+coin,
@@ -203,6 +203,31 @@ function Dashboard(coinData) {
       return location.reload(); 
     }
     return alert("주문 취소에 실패하였습니다.")
+  }
+
+  const onPortfolioClick = async (e:any, quantity:any) =>{
+    e.preventDefault();
+    setCoin(e.currentTarget.id.replace("KRW-",""))  
+    if(select==="매도"){
+      setAmount(+quantity)
+      setPrice(+data.find((d:any)=>d.code===e.currentTarget.id).trade_price)
+      return setTotalPrice(+quantity* +price)
+      // setAmount(0)
+      // setPrice(e.currentTarget.childNodes[1].innerText.replace(/[^0-9.]/g, ''))
+      // return setTotalPrice(0)
+    }  
+    return setPrice(data.find((d:any)=>d.code===e.currentTarget.id).trade_price)
+    // let price = Number(e.currentTarget.childNodes[1].innerText.replace(/[^0-9.]/g, ''));
+    // let amount = Number((balance/price).toFixed(8))
+    // let totalPrice = price * +amount;
+    // while(totalPrice >balance){
+    //   amount = +amount - 0.00000001
+    //   totalPrice = price*amount
+    // }
+    // setAmount(amount);
+    // setPrice(price);
+    // setTmpPrice(price)
+    // setTotalPrice(totalPrice)
   }
 
 
@@ -241,7 +266,7 @@ function Dashboard(coinData) {
 
       {/* <!-- Cards --> */}
       <div className='grid gap-3 mb-8 md:grid-cols-1 xl:grid-cols-3'>
-          <InfoCard title="총 보유자산" value={roundToFiveDecimalPlaces(totalAsset).toLocaleString()} className="md:w-full lg:w-1/2" >
+          <InfoCard title="총 보유자산" value={roundToFiveDecimalPlaces(+totalAsset).toLocaleString()} className="md:w-full lg:w-1/2" >
             {/* @ts-ignore */}
             <RoundIcon
               icon={CartIcon}
@@ -250,7 +275,7 @@ function Dashboard(coinData) {
               className="mr-4"
             />
           </InfoCard>
-          <InfoCard title="보유KRW" value={roundToFiveDecimalPlaces(balance).toLocaleString()} className="w-1/2">
+          <InfoCard title="보유KRW" value={roundToFiveDecimalPlaces(+balance).toLocaleString()} className="w-1/2">
             {/* @ts-ignore */}
             <RoundIcon
               icon={CartIcon}
@@ -259,7 +284,7 @@ function Dashboard(coinData) {
               className="mr-4 "
             />
           </InfoCard>
-          <InfoCard title="가용KRW" value={roundToFiveDecimalPlaces(availableBalance).toLocaleString()} className="w-1/2">
+          <InfoCard title="가용KRW" value={roundToFiveDecimalPlaces(+availableBalance).toLocaleString()} className="w-1/2">
             {/* @ts-ignore */}
             <RoundIcon
               icon={CartIcon}
@@ -424,32 +449,32 @@ function Dashboard(coinData) {
             </TableHeader>
             <TableBody>
              {portfolioData.map((portfolio, i) => (
-                <TableRow key={i} id={portfolio.market} >
+                <TableRow key={i} id={portfolio.market} onClick={e=>onPortfolioClick(e,portfolio.quantity,portfolio.averagePrice)} >
                   <TableCell className='text-xs lg:text-base'>{portfolio.market}</TableCell>
                   <TableCell className='flex flex-grow text-xs lg:text-base'>
                     <div className='flex flex-col w-full'>
-                      <div style={{ textAlign: 'right' }}  className="m-1">{((+portfolio.quantity)).toLocaleString()}</div>
-                      <div style={{ textAlign: 'right' }}  className="m-1">{(+portfolio.evaluatedPrice).toLocaleString()}</div>
+                      <div style={{ textAlign: 'right' }}  className="m-1">{((+portfolio.quantity)).toLocaleString('ko-KR',localeStringOptions)}</div>
+                      <div style={{ textAlign: 'right' }}  className="m-1">{(+portfolio.evaluatedPrice).toLocaleString('ko-KR',localeStringOptions)}</div>
                     </div>  
                     <div className='flex flex-col w-full'>
-                      <div style={{ textAlign: 'right' }}  className="m-1">{(+portfolio.averagePrice).toLocaleString()}</div>
-                      <div style={{ textAlign: 'right' }}  className="m-1">{(+portfolio.totalInvested).toLocaleString()}</div>
+                      <div style={{ textAlign: 'right' }}  className="m-1">{(+portfolio.averagePrice).toLocaleString('ko-KR',localeStringOptions)}</div>
+                      <div style={{ textAlign: 'right' }}  className="m-1">{(+portfolio.totalInvested).toLocaleString('ko-KR',localeStringOptions)}</div>
                     </div>
                     <div className='flex flex-col w-full'>
                       <div style={{ textAlign: 'right' }}  className="m-1">
                         {
                         portfolio.evaluatedGainAndLoss < 0 ?
                         <div className={"text-red-600"}>
-                          {(+portfolio.evaluatedGainAndLoss).toLocaleString()}
+                          {(+portfolio.evaluatedGainAndLoss).toLocaleString('ko-KR',localeStringOptions)}
                         </div>
                         :
                         portfolio.evaluatedGainAndLoss == 0 ?
                         <div > 
-                          {(+portfolio.evaluatedGainAndLoss).toLocaleString()}
+                          {(+portfolio.evaluatedGainAndLoss).toLocaleString('ko-KR',localeStringOptions)}
                         </div>
                         :
                         <div className={"text-green-700"}> 
-                          {(+portfolio.evaluatedGainAndLoss).toLocaleString()}
+                          {(+portfolio.evaluatedGainAndLoss).toLocaleString('ko-KR',localeStringOptions)}
                         </div>
                       }
                       </div>
@@ -511,10 +536,10 @@ function Dashboard(coinData) {
                     </div>
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm"> {(+transaction.price).toLocaleString()}</span>
+                    <span className="text-sm"> {(roundToFiveDecimalPlaces(+transaction.price)).toLocaleString('ko-KR',localeStringOptions)}</span>
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm"> {(+transaction.quantity).toLocaleString()}</span>
+                    <span className="text-sm"> {(roundToNineDecimalPlaces(+transaction.quantity)).toLocaleString('ko-KR',localeStringOptions)}</span>
                   </TableCell>
                   <TableCell>
                     <span className="text-sm"> {convertDate(transaction.createdAt)}</span>

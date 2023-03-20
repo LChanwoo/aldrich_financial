@@ -13,6 +13,7 @@ import { UserDataDto } from '../user/dto/userData.dto';
 import { ConnectedSocket } from '@nestjs/websockets';
 import { DeleteTransactionDto } from './dto/deleteTransaction.dto';
 import { roundToFiveDecimalPlaces } from '../../utils/roundToFiveDecimalPlaces';
+import { roundToNineDecimalPlaces } from '../../utils/roundToNineDecimalPlaces';
 
 @Injectable()
 export class CoinService {
@@ -46,6 +47,7 @@ export class CoinService {
       const portfolioData = userData.portfolios.map((portfolio) => {
           const currentPrice = JSON.parse(coinPrice[marketData.indexOf(portfolio.market)]).trade_price;
           const evaluatedPrice = roundToFiveDecimalPlaces(+(portfolio.quantity * currentPrice));
+          console.log(portfolio.quantity)
           return {
             market: portfolio.market,
             quantity: portfolio.quantity,
@@ -90,6 +92,9 @@ export class CoinService {
   }
 
   public async order(body: TransactionDto, user: UserDataDto) {
+    if(body.amount*body.price<5000){
+      throw new HttpException('최소 거래 금액은 5,000원 입니다.', 400);
+    }
     if(body.transactionType==="매수"){
       return this.purchaseCoin(body, user);
     }
@@ -104,24 +109,27 @@ export class CoinService {
       await this.entityManager.transaction(async (manager) => {
         const userData = await manager.findOne(User, {where:{ email: user.email },  relations: ['transactions', 'portfolios'] });
         const availableBalance = userData.availableBalance;
-        const coinPrice = body.price;
-        const coinAmount = body.amount;
-        const totalPrice = coinPrice * coinAmount;
+        const coinPrice = roundToFiveDecimalPlaces(+body.price);
+        console.log('coinPrice', coinPrice);
+        const coinAmount = roundToNineDecimalPlaces(+body.amount);
+        console.log('coinAmount', coinAmount);
+        const totalPrice = roundToFiveDecimalPlaces(coinPrice * coinAmount);
+        console.log('totalPrice', totalPrice);
         if (totalPrice > availableBalance) {
           throw new BadRequestException('잔액이 부족합니다.');
         }
-        userData.availableBalance = availableBalance - totalPrice;
-        await manager.save(userData);
+        userData.availableBalance = roundToFiveDecimalPlaces(+availableBalance - +totalPrice);
         const newTransaction = this.transactionRepository.create({
           user_id: user.id,
           market: body.coinName,
-          quantity: coinAmount,
+          quantity: +coinAmount,
           price: coinPrice,
           totalPrice: totalPrice,
           transactionType: '매수',
         });
+        await manager.save(userData);
         await manager.save(newTransaction);
-      });
+       })
       return { message: '매수 요청 성공' };
     } catch (error) {
       console.error(error);
@@ -133,8 +141,8 @@ export class CoinService {
     try {
       await this.entityManager.transaction(async (manager) => {
         const userData = await this.entityManager.findOne(User, {where:{ email: user.email },  relations: ['transactions', 'portfolios'] });
-        const coinPrice = body.price;
-        const coinAmount = body.amount;
+        const coinPrice = +body.price;
+        const coinAmount = +body.amount;
         const totalPrice = coinPrice * coinAmount;
         await this.entityManager.save(userData);
         const newTransaction = this.transactionRepository.create({
