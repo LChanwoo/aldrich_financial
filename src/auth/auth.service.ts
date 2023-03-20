@@ -12,7 +12,6 @@ export class AuthService {
   ) {}
 
   async certification(email:string ,password:string){
-    console.log(email,password);
     const user = await this.userRepository.findOneBy({email});
     const isMatch = await bcrypt.compare(password, user.password); 
     if(isMatch){

@@ -87,7 +87,7 @@ function Dashboard(coinData) {
   const [gainsAndLoses,setGainsAndLoses] = useState(coinData.totalGainAndLoss)
   const [profitRate,setProfitRate] = useState(coinData.profitRate)
   const [totalAsset,setTotalAsset] = useState(+balance+ +totalValue)
-  const [portfolioData,setPortfolioDara] = useState(coinData.portfolioData)
+  const [portfolioData,setPortfolioData] = useState(coinData.portfolioData)
   const [transactionData,setTransactionData] = useState(coinData.transactionData)
   const [cancleData,setCancleData] = useState("")
   const resultsPerPage = 10
@@ -208,37 +208,20 @@ function Dashboard(coinData) {
   const onPortfolioClick = async (e:any, quantity:any) =>{
     e.preventDefault();
     setCoin(e.currentTarget.id.replace("KRW-",""))  
+    const newPrice = data.find((d:any)=>d.code===e.currentTarget.id).trade_price
     if(select==="매도"){
       setAmount(+quantity)
-      setPrice(+data.find((d:any)=>d.code===e.currentTarget.id).trade_price)
-      return setTotalPrice(+quantity* +price)
-      // setAmount(0)
-      // setPrice(e.currentTarget.childNodes[1].innerText.replace(/[^0-9.]/g, ''))
-      // return setTotalPrice(0)
+      setPrice(newPrice)
+      return setTotalPrice(+quantity* +newPrice)
     }  
     return setPrice(data.find((d:any)=>d.code===e.currentTarget.id).trade_price)
-    // let price = Number(e.currentTarget.childNodes[1].innerText.replace(/[^0-9.]/g, ''));
-    // let amount = Number((balance/price).toFixed(8))
-    // let totalPrice = price * +amount;
-    // while(totalPrice >balance){
-    //   amount = +amount - 0.00000001
-    //   totalPrice = price*amount
-    // }
-    // setAmount(amount);
-    // setPrice(price);
-    // setTmpPrice(price)
-    // setTotalPrice(totalPrice)
   }
 
-
-  // on page change, load new sliced data
-  // here you would make another server request for new data
   useEffect(() => {
      //WebSocket 서버와 연결합니다.
     const socket = io('/ws-coin-price');
     socket.on('connect', () => {
       console.log('Socket connected');
-      // socket.emit('subscribe', 'coinPrice');
     });
     
     socket.on('disconnect', () => {
@@ -246,11 +229,24 @@ function Dashboard(coinData) {
     });
     // 코인 가격 정보를 받으면, 화면에 업데이트합니다.
     socket.on('coinPriceUpdate', (data) => {
-      // setData(data.slice((page - 1) * resultsPerPage, page * resultsPerPage))
-      // setCoinPrice(data);
       const response = data.map((item:any)=>JSON.parse(item!.toString()))
-      setData(response);
-      // console.log(response);
+      setData(response); 
+      const newPortfolioData = portfolioData.map((item:any)=>{
+        const newPrice = response.find((d:any)=>d.code===item.market).trade_price
+        const newEvaluatedPrice = newPrice* +item.quantity
+        return {
+          ...item,
+          evaluatedPrice:newEvaluatedPrice,
+          evaluatedGainAndLoss:newEvaluatedPrice - +item.totalInvested,
+          profitRate:((newEvaluatedPrice - +item.totalInvested)/+item.totalInvested)*100
+        }
+      });
+      const newTotalValue = newPortfolioData.reduce((acc:any,cur:any)=>acc+cur.evaluatedPrice,0)
+      setPortfolioData(newPortfolioData)
+      setTotalValue(newTotalValue)
+      setGainsAndLoses(newPortfolioData.reduce((acc:any,cur:any)=>acc+cur.evaluatedGainAndLoss,0))
+      setProfitRate(Math.round((newPortfolioData.reduce((acc:any,cur:any)=>acc+cur.evaluatedGainAndLoss,0)/newPortfolioData.reduce((acc:any,cur:any)=>acc+cur.totalInvested,0))*10000)/100)
+      setTotalAsset(+newTotalValue+ +balance)
     });
     return () => {
       // 페이지가 unmount 될 때, WebSocket 연결을 종료합니다.
@@ -449,7 +445,7 @@ function Dashboard(coinData) {
             </TableHeader>
             <TableBody>
              {portfolioData.map((portfolio, i) => (
-                <TableRow key={i} id={portfolio.market} onClick={e=>onPortfolioClick(e,portfolio.quantity,portfolio.averagePrice)} >
+                <TableRow key={i} id={portfolio.market} onClick={e=>onPortfolioClick(e,portfolio.quantity)} >
                   <TableCell className='text-xs lg:text-base'>{portfolio.market}</TableCell>
                   <TableCell className='flex flex-grow text-xs lg:text-base'>
                     <div className='flex flex-col w-full'>

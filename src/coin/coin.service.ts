@@ -47,7 +47,6 @@ export class CoinService {
       const portfolioData = userData.portfolios.map((portfolio) => {
           const currentPrice = JSON.parse(coinPrice[marketData.indexOf(portfolio.market)]).trade_price;
           const evaluatedPrice = roundToFiveDecimalPlaces(+(portfolio.quantity * currentPrice));
-          console.log(portfolio.quantity)
           return {
             market: portfolio.market,
             quantity: portfolio.quantity,
@@ -66,7 +65,6 @@ export class CoinService {
       if(isNaN(profitRate)){
         profitRate = 0;
       }
-      console.log(profitRate)
     return { 
       coinPrice,
       balance,
