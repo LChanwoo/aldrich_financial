@@ -46,15 +46,14 @@ export class UserService {
   public async getRanking() {
     const ranking = await this.userRepository.find({relations: ['transactions', 'portfolios'],});
     const sorted = ranking.sort((a, b) => {
-      console.log(a.totalScore, b.totalScore)
-      if(a.totalScore !== b.totalScore){
-        return b.totalScore - a.totalScore;
+      if(+a.totalScore !== +b.totalScore){
+        return +b.totalScore - +a.totalScore;
       }
-      if(a.totalInvested !== b.totalInvested){
-        return b.totalInvested - a.totalInvested;
+      if(+a.totalInvested !== +b.totalInvested){
+        return +b.totalInvested - +a.totalInvested;
       }
-      if(a.balance !== b.balance){
-        return b.balance - a.balance;
+      if(+a.balance !== +b.balance){
+        return +b.balance - +a.balance;
       }
       return 0;
     });

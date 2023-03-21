@@ -45,58 +45,58 @@ const routes: IRoute[] = [
     icon: 'CardsIcon',
     name: '코인뉴스',
   },
-  {
-    path: '/news',
-    icon: 'FormsIcon',
-    name: 'Forms',
-  },
-  {
-    path: '/example/charts',
-    icon: 'ChartsIcon',
-    name: 'Charts',
-  },
-  {
-    path: '/example/buttons',
-    icon: 'ButtonsIcon',
-    name: 'Buttons',
-  },
-  {
-    path: '/example/modals',
-    icon: 'ModalsIcon',
-    name: 'Modals',
-  },
-  {
-    path: '/example/tables',
-    icon: 'TablesIcon',
-    name: 'Tables',
-  },
-  {
-    icon: 'PagesIcon',
-    name: 'Pages',
-    routes: [
-      // submenu
-      {
-        path: '/example/login',
-        name: 'Login',
-      },
-      {
-        path: '/example/create-account',
-        name: 'Create account',
-      },
-      {
-        path: '/example/forgot-password',
-        name: 'Forgot password',
-      },
-      {
-        path: '/example/404',
-        name: '404',
-      },
-      {
-        path: '/example/blank',
-        name: 'Blank',
-      },
-    ],
-  },
+  // {
+  //   path: '/news',
+  //   icon: 'FormsIcon',
+  //   name: 'Forms',
+  // },
+  // {
+  //   path: '/example/charts',
+  //   icon: 'ChartsIcon',
+  //   name: 'Charts',
+  // },
+  // {
+  //   path: '/example/buttons',
+  //   icon: 'ButtonsIcon',
+  //   name: 'Buttons',
+  // },
+  // {
+  //   path: '/example/modals',
+  //   icon: 'ModalsIcon',
+  //   name: 'Modals',
+  // },
+  // {
+  //   path: '/example/tables',
+  //   icon: 'TablesIcon',
+  //   name: 'Tables',
+  // },
+  // {
+  //   icon: 'PagesIcon',
+  //   name: 'Pages',
+  //   routes: [
+  //     // submenu
+  //     {
+  //       path: '/example/login',
+  //       name: 'Login',
+  //     },
+  //     {
+  //       path: '/example/create-account',
+  //       name: 'Create account',
+  //     },
+  //     {
+  //       path: '/example/forgot-password',
+  //       name: 'Forgot password',
+  //     },
+  //     {
+  //       path: '/example/404',
+  //       name: '404',
+  //     },
+  //     {
+  //       path: '/example/blank',
+  //       name: 'Blank',
+  //     },
+  //   ],
+  // },
 ]
 
 export type {IRoute}

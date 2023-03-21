@@ -16,7 +16,7 @@ export class CrawlingService {
     const response = await axios.get(this.baseUrl, {
       params: {
         where: 'news',
-        query: '코인',
+        query: '코인 암호화폐',
         sm: 'tab_opt',
         sort: '1',
       },

@@ -40,8 +40,6 @@ export class AppController {
   @UseGuards(AuthenticatedGuard)
   @UseFilters(new HttpExceptionFilter())
   public dashboard(@Req() req:any) {
-    // console.log("꺄ㅏㅏㅏㅏㅏㅏㅏ1")
-    // console.log(req.user)
     return {};
   }
   @Render('create-account')
@@ -75,6 +73,12 @@ export class AppController {
   @UseGuards(AuthenticatedGuard)
   @UseFilters(new HttpExceptionFilter())
   public portfolio() {
+    return {};
+  }
+
+  @Render('modals')
+  @Get('/modals')
+  public modals() {
     return {};
   }
 

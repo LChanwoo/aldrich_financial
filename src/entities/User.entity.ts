@@ -27,11 +27,11 @@ export class User {
 
 
   get totalInvested(): number {
-    return this.portfolios?.reduce((total, portfolio) => total + (portfolio.totalInvested || 0), 0) || 0;
+    return this.portfolios?.reduce((total, portfolio) => +total + (+portfolio.totalInvested || 0), 0) || 0;
   }
 
   get totalScore(): number {
-    return this.portfolios?.reduce((total, portfolio) => total + (portfolio.totalInvested || 0), 0) +this.balance || 0;
+    return +this.totalInvested + +this.balance;
   }
 
   toObject(): any {

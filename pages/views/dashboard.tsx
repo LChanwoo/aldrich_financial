@@ -32,7 +32,12 @@ import {
   HelperText,
   Input,
   Textarea,
-  Select
+  Select,
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  Button
 } from '@roketid/windmill-react-ui'
 
 import {
@@ -90,6 +95,8 @@ function Dashboard(coinData) {
   const [portfolioData,setPortfolioData] = useState(coinData.portfolioData)
   const [transactionData,setTransactionData] = useState(coinData.transactionData)
   const [cancleData,setCancleData] = useState("")
+  const [isModalOpen, setIsModalOpen] = useState(false)
+
   const resultsPerPage = 10
   const totalResults = response.length
 
@@ -164,7 +171,19 @@ function Dashboard(coinData) {
     setPrice( calPrice);
     setTotalPrice(totalPrice);
   }
-  const onOrderClick = async (e:any) =>{
+  const onOrderCheckClick = async (e:any) =>{
+    e.preventDefault();
+    
+    if(amount===0 || price===0){
+      return alert("주문 수량 또는 가격을 입력해주세요.")
+    }
+
+    if(amount*price<5000){
+      return alert("최소 주문 금액은 5,000원 입니다.")
+    }
+    setIsModalOpen(true)
+  }
+    const onOrderButtonClick = async (e:any) =>{
     e.preventDefault();
     
     if(amount===0 || price===0){
@@ -181,10 +200,11 @@ function Dashboard(coinData) {
       price:price
     })
     if(res.status===201){
+      alert("주문이 완료되었습니다.")
       return location.reload();
     }
-    return alert("주문에 실패하였습니다.")
-
+    alert("주문에 실패하였습니다.")
+    return setIsModalOpen(false);
   }
   const onCancleRadioClick = (e:any) =>{
     setCancleData(e.currentTarget.id)
@@ -217,6 +237,15 @@ function Dashboard(coinData) {
     return setPrice(data.find((d:any)=>d.code===e.currentTarget.id).trade_price)
   }
 
+  function openModal() {
+    setIsModalOpen(true)
+  }
+
+  function closeModal() {
+    setIsModalOpen(false)
+  }
+
+
   useEffect(() => {
      //WebSocket 서버와 연결합니다.
     const socket = io('/ws-coin-price');
@@ -238,14 +267,14 @@ function Dashboard(coinData) {
           ...item,
           evaluatedPrice:newEvaluatedPrice,
           evaluatedGainAndLoss:newEvaluatedPrice - +item.totalInvested,
-          profitRate:((newEvaluatedPrice - +item.totalInvested)/+item.totalInvested)*100
+          profitRate:Math.round(((newEvaluatedPrice - +item.totalInvested)/+item.totalInvested)*10000)/100
         }
       });
-      const newTotalValue = newPortfolioData.reduce((acc:any,cur:any)=>acc+cur.evaluatedPrice,0)
+      const newTotalValue = newPortfolioData.reduce((acc:any,cur:any)=>acc+ +cur.evaluatedPrice,0)
       setPortfolioData(newPortfolioData)
       setTotalValue(newTotalValue)
-      setGainsAndLoses(newPortfolioData.reduce((acc:any,cur:any)=>acc+cur.evaluatedGainAndLoss,0))
-      setProfitRate(Math.round((newPortfolioData.reduce((acc:any,cur:any)=>acc+cur.evaluatedGainAndLoss,0)/newPortfolioData.reduce((acc:any,cur:any)=>acc+cur.totalInvested,0))*10000)/100)
+      setGainsAndLoses(newPortfolioData.reduce((acc:any,cur:any)=>acc+ +cur.evaluatedGainAndLoss,0))
+      setProfitRate(Math.round((newPortfolioData.reduce((acc:any,cur:any)=>acc+ +cur.evaluatedGainAndLoss,0)/newPortfolioData.reduce((acc:any,cur:any)=>acc+ +cur.totalInvested,0))*10000)/100)
       setTotalAsset(+newTotalValue+ +balance)
     });
     return () => {
@@ -414,12 +443,76 @@ function Dashboard(coinData) {
             </span>
           </div> */}
         </Label>
-          <div className="right-0"style={{textAlign:'right'}}  >
+          {/* <div className="right-0"style={{textAlign:'right'}}  >
             <button style={{textAlign:'right'}} className="inset-y-0 right-0 px-4 text-sm font-medium leading-10 text-white transition-colors duration-150 bg-purple-600 border border-transparent rounded-r-md active:bg-purple-600 hover:bg-purple-700 focus:outline-none focus:shadow-outline-purple"
             onClick={onOrderClick}>
               거래
             </button>
+          </div> */}
+          <div style={{textAlign:"right"}}>
+            <Button onClick={onOrderCheckClick}>주문</Button>
           </div>
+          <Modal isOpen={isModalOpen} onClose={closeModal}>
+            {select==="매수"? <ModalHeader className='text-center text-green-500'>매수주문 확인</ModalHeader> : <ModalHeader className='text-center text-red-500'>매도주문 확인</ModalHeader>}
+            <ModalHeader className='bg-gray-200 text-center'>{coin+" - KRW"}</ModalHeader>
+            <ModalBody>
+              <TableContainer>
+                <Table>
+                  {/* <TableHeader>
+                  </TableHeader> */}
+                  <TableBody>
+                    <TableCell>
+                      주문가격
+                    </TableCell>
+                    <TableCell className='text-right font-semibold'>
+                      {price.toLocaleString()} KRW
+                    </TableCell>
+                  </TableBody>
+                  <TableBody>
+                    <TableCell>
+                      주문수량
+                    </TableCell>
+                    <TableCell className='text-right font-semibold'>
+                      {amount.toLocaleString() } {coin}
+                    </TableCell>
+                  </TableBody>
+                  <TableBody>
+                    <TableCell>
+                      주문총액
+                    </TableCell>
+                    <TableCell className='text-right font-semibold'>
+                      {totalPrice.toLocaleString()} KRW
+                    </TableCell>
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </ModalBody>
+            <ModalFooter>
+              {/* I don't like this approach. Consider passing a prop to ModalFooter
+              * that if present, would duplicate the buttons in a way similar to this.
+              * Or, maybe find some way to pass something like size="large md:regular"
+              * to Button
+              */}
+              <div className="hidden sm:block">
+                <Button layout="outline" onClick={closeModal}>
+                  취소
+                </Button>
+              </div>
+              <div className="hidden sm:block" onClick={onOrderButtonClick}>
+                <Button> 주문</Button>
+              </div>
+              <div className="block w-full sm:hidden" onClick={onOrderButtonClick}>
+                <Button block size="large">
+                  주문
+                </Button>
+              </div>
+              <div className="block w-full sm:hidden">
+                <Button block size="large" layout="outline" onClick={closeModal}>
+                  취소
+                </Button>
+              </div>
+            </ModalFooter>
+          </Modal>
         </div>
         <PageTitle>보유자산</PageTitle>
         <TableContainer>

@@ -22,13 +22,13 @@ function Cards(props :any) {
             <span className='text-3xl'> {index+1}위 {user.email}</span>
 
               <p className="text-base text-gray-600 dark:text-gray-400">
-                총 매수 : {user.totalInvested.toLocaleString()}
+                총 매수 : {(user.totalInvested).toLocaleString()}
               </p>
               <p className="text-base text-gray-600 dark:text-gray-400">
-                보유 KRW :{user.balance.toLocaleString()}
+                보유 KRW :{(+user.balance).toLocaleString()}
               </p>
               <p className="text-base text-gray-600 dark:text-gray-400">
-                종합점수 : {user.totalScore.toLocaleString()}
+                종합점수 : {(user.totalScore).toLocaleString()}
               </p>
             {/* <p className="text-sm text-gray-600 dark:text-gray-400 " style={{ textAlign: 'right' }} >{item.time}</p> */}
           </CardBody>

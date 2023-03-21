@@ -142,7 +142,7 @@ export class CoinService {
         const coinPrice = +body.price;
         const coinAmount = +body.amount;
         const totalPrice = coinPrice * coinAmount;
-        await this.entityManager.save(userData);
+        await manager.save(userData);
         const newTransaction = this.transactionRepository.create({
           user_id: user.id,
           market: body.coinName,
@@ -151,7 +151,7 @@ export class CoinService {
           totalPrice: totalPrice,
           transactionType: '매도',
         });
-        await this.entityManager.save(newTransaction);
+        await manager.save(newTransaction);
       });
       return { message: '매도 요청 성공' };
     } catch (error) {
@@ -172,7 +172,9 @@ export class CoinService {
     await this.entityManager.transaction(async (manager) => {
       const deleteTransaction = await manager.findOne(Transaction, {where:{ user_id: userData.id, id:body.transactionId, doneAt: null }});
       if(deleteTransaction){
-        const user = await manager.update(User, {id:userData.id}, {availableBalance: +userInfo.availableBalance + +deleteTransaction.totalPrice})
+        if(deleteTransaction.transactionType==='매수'){
+         await manager.update(User, {id:userData.id}, {availableBalance: +userInfo.availableBalance + +deleteTransaction.totalPrice})
+        }
         const res=await this.transactionRepository.delete({id:body.transactionId});
         console.log(res)
       }else {

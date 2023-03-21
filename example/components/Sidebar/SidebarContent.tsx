@@ -56,11 +56,11 @@ function SidebarContent({ linkClicked }: ISidebarContent) {
                     ></span>
                   )}
 
-                  {/* <Icon
+                  <Icon
                     className='w-5 h-5'
                     aria-hidden='true'
                     icon={route.icon || ''}
-                  /> */}
+                  />
                   <span className='ml-4'>{route.name}</span>
                 </a>
               </Link>
@@ -69,12 +69,12 @@ function SidebarContent({ linkClicked }: ISidebarContent) {
         )}
       </ul>
       <div className="px-6 my-6">
-        <Button>
+        {/* <Button>
           Create account
           <span className="ml-2" aria-hidden="true">
             +
           </span>
-        </Button>
+        </Button> */}
       </div>
     </div>
   )
