@@ -11,7 +11,7 @@ COPY . /usr/src/app
 
 RUN yarn install
 
-RUN npm run build
+RUN yarn build
 
 FROM node:18-alpine AS production
 
@@ -24,7 +24,7 @@ COPY package*.json ./
 
 COPY . /usr/src/app
 
-RUN npm install --only=production 
+RUN yarn install 
 
 VOLUME /var/log/nestjs
 
