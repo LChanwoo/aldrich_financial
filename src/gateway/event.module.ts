@@ -8,10 +8,11 @@ import { RedisService, RedisModule } from '@liaoliaots/nestjs-redis';
 import { CoinPriceGateway } from './coin-price.gateway';
 
 @Module({
-    imports: [   
+    imports: [
+      ConfigModule.forRoot(),   
       RedisModule.forRoot({
         config: {
-          host: process.env.REDIS_HOSTNAME || 'localhost',
+          host: process.env.REDIS_HOSTNAME || '172.17.0.1',
           port: 6379,
         }
       })
