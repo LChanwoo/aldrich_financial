@@ -13,10 +13,10 @@ export class User {
   @Column()
   password!: string;
 
-  @Column('decimal',{default: 1000000, precision: 30, scale: 4 })
+  @Column('decimal',{default: 10000000, precision: 30, scale: 4 })
   balance!: number;
 
-  @Column('decimal',{default: 1000000, precision: 30, scale: 4 })
+  @Column('decimal',{default: 10000000, precision: 30, scale: 4 })
   availableBalance!: number;
 
   @OneToMany(() => Transaction, (transaction) => transaction.user)
@@ -25,7 +25,9 @@ export class User {
   @OneToMany(() => Portfolio, (portfolio) => portfolio.user)
   portfolios?: Portfolio[];
 
-
+  get NotTradedTransactions(): Transaction[]  {
+    return this.transactions?.filter((transaction) => transaction.doneAt === null);
+  }
   get totalInvested(): number {
     return this.portfolios?.reduce((total, portfolio) => +total + (+portfolio.totalInvested || 0), 0) || 0;
   }

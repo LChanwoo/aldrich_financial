@@ -193,17 +193,28 @@ function Dashboard(coinData) {
     if(amount*price<5000){
       return alert("최소 주문 금액은 5,000원 입니다.")
     }
-    const res = await axios.post('/api/order',{
-      coinName:"KRW-"+coin,
-      transactionType:select,
-      amount:amount,
-      price:price
-    })
-    if(res.status===201){
-      alert("주문이 완료되었습니다.")
-      return location.reload();
+    try{
+      const res = await axios.post('/api/order',{
+        coinName:"KRW-"+coin,
+        transactionType:select,
+        amount:amount,
+        price:price
+      })
+      if(res.status===201){
+        alert("주문이 완료되었습니다.")
+        return location.reload();
+      }
+    }catch(err : any){
+      console.log(err.response.data.error.message)
+      if(
+        err.response.data.error.message==="보유량보다 많은 수량을 매도할 수 없습니다."
+        ||err.response.data.error.message==="매도 가능한 수량이 부족합니다."
+        ){
+        alert(`주문에 실패하였습니다. - ${err.response.data.error.message}`)
+        return setIsModalOpen(false);
+      }
     }
-    alert("주문에 실패하였습니다.")
+      alert("주문에 실패하였습니다.")
     return setIsModalOpen(false);
   }
   const onCancleRadioClick = (e:any) =>{
@@ -265,15 +276,15 @@ function Dashboard(coinData) {
         const newEvaluatedPrice = newPrice* +item.quantity
         return {
           ...item,
-          evaluatedPrice:newEvaluatedPrice,
-          evaluatedGainAndLoss:newEvaluatedPrice - +item.totalInvested,
+          evaluatedPrice: roundToFiveDecimalPlaces(+newEvaluatedPrice),
+          evaluatedGainAndLoss:roundToFiveDecimalPlaces( newEvaluatedPrice - +item.totalInvested),
           profitRate:Math.round(((newEvaluatedPrice - +item.totalInvested)/+item.totalInvested)*10000)/100
         }
       });
       const newTotalValue = newPortfolioData.reduce((acc:any,cur:any)=>acc+ +cur.evaluatedPrice,0)
       setPortfolioData(newPortfolioData)
       setTotalValue(newTotalValue)
-      setGainsAndLoses(newPortfolioData.reduce((acc:any,cur:any)=>acc+ +cur.evaluatedGainAndLoss,0))
+      setGainsAndLoses( newPortfolioData.reduce((acc:any,cur:any)=>acc+ +cur.evaluatedGainAndLoss,0))
       setProfitRate(Math.round((newPortfolioData.reduce((acc:any,cur:any)=>acc+ +cur.evaluatedGainAndLoss,0)/newPortfolioData.reduce((acc:any,cur:any)=>acc+ +cur.totalInvested,0))*10000)/100)
       setTotalAsset(+newTotalValue+ +balance)
     });

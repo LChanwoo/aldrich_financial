@@ -21,9 +21,7 @@ export class CrawlingScheduler {
     this.logger.log('Crawling started');
     try {
       const newsList = await this.crawlingService.crawlNews();
-      // console.log(newsList);
-
-      const res =await this.crawlingService.saveNews(newsList); 
+      await this.crawlingService.saveNews(newsList); 
     } catch (error) {
       this.logger.error('Crawling failed', error);
     }

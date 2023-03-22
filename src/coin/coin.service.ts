@@ -139,6 +139,12 @@ export class CoinService {
     try {
       await this.entityManager.transaction(async (manager) => {
         const userData = await this.entityManager.findOne(User, {where:{ email: user.email },  relations: ['transactions', 'portfolios'] });
+        const thisPortfolio = userData.portfolios.find((portfolio) => portfolio.market === body.coinName);
+        const notTradedTransactions = userData.NotTradedTransactions.filter((transaction) => transaction.market === body.coinName && transaction.transactionType === '매도');
+        const notTradedQuantity = notTradedTransactions.reduce((acc, cur) => acc + +cur.quantity, 0);
+        if(+body.amount> + thisPortfolio.quantity - notTradedQuantity){
+          throw new BadRequestException('보유량보다 많은 수량을 매도할 수 없습니다.');
+        }
         const coinPrice = +body.price;
         const coinAmount = +body.amount;
         const totalPrice = coinPrice * coinAmount;
@@ -150,6 +156,7 @@ export class CoinService {
           price: coinPrice,
           totalPrice: totalPrice,
           transactionType: '매도',
+          doneAt: null,
         });
         await manager.save(newTransaction);
       });

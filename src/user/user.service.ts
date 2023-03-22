@@ -43,6 +43,7 @@ export class UserService {
     }
     return userInfo;
   }   
+  
   public async getRanking() {
     const ranking = await this.userRepository.find({relations: ['transactions', 'portfolios'],});
     const sorted = ranking.sort((a, b) => {

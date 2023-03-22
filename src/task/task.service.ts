@@ -32,7 +32,6 @@ export class TaskService {
       .leftJoinAndSelect('transaction.user', 'user')
       .where('transaction.doneAt IS NULL')
       .getMany();
-    // console.log(transactionData)
     transactionData.forEach(async (transaction) => {
       const currentPrice = JSON.parse(await this.redis.getClient().get(transaction.market)).trade_price;
       await this.entityManager.transaction(async (transactionManager) => {
@@ -85,13 +84,12 @@ export class TaskService {
             if(+portfolio.quantity - Number(transaction.quantity)===0){
               averagePrice = 0;
             }
-            console.log(averagePrice,quantity)
             if(quantity<=0){
               await this.portfolioRepository.delete({ id: portfolio.id });
             } else {
               await this.portfolioRepository.update({ id: portfolio.id }, {
                 quantity: Number(portfolio.quantity) - Number(transaction.quantity),
-                averagePrice: averagePrice,
+                averagePrice: +averagePrice,
                 totalInvested: +portfolio.totalInvested - Number(transaction.quantity) * +currentPrice,
           });
             }
@@ -106,8 +104,8 @@ export class TaskService {
           }
           await this.userRepository.update({ id: transaction.user_id }, 
             {
-              balance: user.balance + +transaction.quantity * currentPrice,
-              availableBalance: user.availableBalance + (user.balance + +transaction.quantity * currentPrice - user.availableBalance),
+              balance: +user.balance + +transaction.quantity * currentPrice,
+              availableBalance: +user.availableBalance + (+user.balance + +transaction.quantity * currentPrice - +user.availableBalance),
             });
           await this.transactionRepository.update({ id: transaction.id }, { doneAt: new Date() });
         }

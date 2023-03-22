@@ -25,14 +25,12 @@ export class CoinPriceGateway implements OnGatewayConnection, OnGatewayDisconnec
     console.log(`Client disconnected: ${client.id}`);
   }
 
-  // @SubscribeMessage('coinPrice')
   startCoinPriceSubscription(client: Socket, ...args: any[]) {
     const interval = setInterval(async () => {
       const redisMarketData = await this.redisService.get("marketData")
       const marketData = redisMarketData!.toString().split(",")
       const coinPrice = await this.redisService.mget(marketData)
-      // console.log( coinPrice )             
       client.emit('coinPriceUpdate', coinPrice);
-    }, 3000);
+    }, 1000);
   }
 }

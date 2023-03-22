@@ -10,7 +10,6 @@ import Layout from 'example/containers/Layout'
 import { CartIcon, ChatIcon, MoneyIcon, PeopleIcon } from 'icons'
 import axios from 'axios'
 function Cards(props :any) {
-  console.log(props.ranking)
   return (
     <Layout>
       <PageTitle>유저 순위</PageTitle>

@@ -47,11 +47,6 @@ export class AppController {
   public createAccount() {
     return {};
   }
-  @Render('forms')
-  @Get('/example/cards')
-  public forms() {
-    return {};
-  }
 
   @Render('news')
   @Get('/news')
@@ -75,12 +70,5 @@ export class AppController {
   public portfolio() {
     return {};
   }
-
-  @Render('modals')
-  @Get('/modals')
-  public modals() {
-    return {};
-  }
-
 
 }
