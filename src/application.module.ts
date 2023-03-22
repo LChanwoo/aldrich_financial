@@ -32,7 +32,7 @@ import { News } from './entities/News.entity';
     ),
     TypeOrmModule.forRoot({
       type: 'mysql', // 데이터베이스 타입
-      host: 'localhost', // 호스트 주소
+      host: process.env.MYSQL_HOSTNAME, // 호스트 주소
       port: 3306, // 포트 번호
       username: 'root', // 사용자 이름
       password: process.env.MYSQL_ROOT_PASSWORD, // 사용자 비밀번호
