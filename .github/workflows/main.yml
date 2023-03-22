@@ -4,7 +4,7 @@ on:
   push:
     branches: [ main ]
 env:
-  DOCKER_IMAGE: ghcr.io/LChanwoo/aldrich_financial
+  DOCKER_IMAGE: ghcr.io/lchanwoo/aldrich_financial
   VERSION: ${{ github.sha }}
   CONTAINER_NAME: aldnancial_cicd
 
