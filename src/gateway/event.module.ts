@@ -11,7 +11,7 @@ import { CoinPriceGateway } from './coin-price.gateway';
     imports: [   
       RedisModule.forRoot({
         config: {
-          host: process.env.REDIS_HOSTNAME ||'127.0.0.1',
+          host: process.env.REDIS_HOSTNAME ||'127.0.0.1'||'redis-server',
           port: 6379,
         }
       })
