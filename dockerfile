@@ -24,7 +24,7 @@ COPY package*.json ./
 
 COPY . /usr/src/app
 
-RUN npm ci --only=production 
+RUN npm install --only=production 
 
 VOLUME /var/log/nestjs
 
