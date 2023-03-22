@@ -9,7 +9,7 @@ COPY package*.json ./
 
 COPY . /usr/src/app
 
-RUN npm install 
+RUN npm install --force
 
 RUN npm run build
 
