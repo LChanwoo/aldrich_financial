@@ -9,9 +9,9 @@ COPY package*.json ./
 
 COPY . /usr/src/app
 
-RUN yarn install
+RUN npm install --force 
 
-RUN yarn build
+RUN npm run build
 
 FROM node:18-alpine AS production
 
@@ -24,7 +24,7 @@ COPY package*.json ./
 
 COPY . /usr/src/app
 
-RUN yarn install 
+RUN npm install 
 
 VOLUME /var/log/nestjs
 
