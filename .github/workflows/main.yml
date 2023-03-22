@@ -67,7 +67,7 @@ jobs:
           password: ${{ secrets.CR_PAT }}
       - name: Docker run
         run: | 
-          docker run  -d -p 4100:4100 -v /home/ubuntu/server/logs:/usr/src/app/logs --name ${{env.CONTAINER_NAME}} --restart always ${{env.DOCKER_IMAGE}}:latest
+          docker run  -d -p 4100:4100 -v /home/ubuntu/server/logs:/usr/src/app/logs --network host --name ${{env.CONTAINER_NAME}} --restart always ${{env.DOCKER_IMAGE}}:latest
       - name: Docker network connect
         run: |
           docker ps -a 
