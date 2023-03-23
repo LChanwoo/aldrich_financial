@@ -11,7 +11,7 @@ COPY . /usr/src/app
 
 RUN yarn install
 
-RUN npm install --force --verbose
+RUN npm install --unsafe-perm
 
 RUN npm run build
 
