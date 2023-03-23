@@ -32,7 +32,7 @@ export class CoinService {
 
   ) { }
 
-  public async coinPrice(user : LoginDto) {
+  public async coinPrice(user : UserDataDto) {
       const redisMarketData = await this.redisService.getClient().get("marketData")
       const marketData = redisMarketData!.toString().split(",")
       const coinPrice = await this.redisService.getClient().mget(marketData)

@@ -17,6 +17,10 @@ export class UserService {
   public async getUsers() {
     return this.userRepository.find();
   }
+  public async killUser(id: number) {
+    const user = await this.userRepository.findOne({ where: { id } });
+    return this.userRepository.remove(user);
+  }
 
   public async createUser(createUserDto: CreateUserDto) {
     const user = new User();
@@ -69,6 +73,9 @@ export class UserService {
       relations: ['transactions', 'portfolios'],
     });
     if (userInfo) {
+      if(userInfo.portfolios.length === 0){
+        return [];
+      }
       const currentPricesPromises = userInfo.portfolios.map(async (portfolio) => {
         const res = await this.redis.getClient().get(portfolio.market)
         return {

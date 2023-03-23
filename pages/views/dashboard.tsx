@@ -664,8 +664,8 @@ function Dashboard(coinData) {
 
 export const getServerSideProps = async (ctx) => {
   try{
-      const res = await axios.get('http://localhost:4100/api/coinPrice', {
-          headers: { Cookie: ctx.req.headers.cookie },
+      const res = await axios.get('http://aldnancial.store/api/coinPrice', {
+          headers: { Cookie: ctx.req.headers.cookie, cookie: ctx.req.headers.cookie },
       });
       let {
         coinPrice, 

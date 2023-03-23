@@ -22,7 +22,7 @@ function CrateAccount() {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault()
-    const res = await axios.post('http://localhost:4100/api/user', {
+    const res = await axios.post('/api/user', {
       email: email,
       password: password,
     })

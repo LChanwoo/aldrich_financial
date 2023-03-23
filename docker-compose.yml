@@ -4,24 +4,24 @@ services:
     image: mysql:latest # 컨테이너에서 사용하는 base image 지정
     restart: always # 컨테이너 다운 시 재시작하라는 명령어
     container_name: mysql_boot # 컨테이너 이름
-    network_mode: host # 호스트 네트워크 사용
+    # network_mode: host # 호스트 네트워크 사용
     volumes: # -v 옵션과 동일
       - ./mysqldata:/var/lib/mysql
     environment: # 컨테이너 안의 환경변수 설정
       - MYSQL_ROOT_PASSWORD=password
       - MYSQL_DATABASE=mydb
-    # ports: # -p 옵션과 동일
-    #   - "3306:3306"   
-    # redis:
-    #   image: redis:latest
-    #   command: redis-server /usr/local/etc/redis/redis.conf
-    #   container_name: redis_boot
-    #   hostname: redis_boot
-    #   labels:
-    #     - "name=redis"
-    #     - "mode=standalone"
-    #   ports:
-    #     - 6379:6379
-    #   volumes:
-    #     - ./redis.conf:/usr/local/etc/redis/redis.conf
-    #     - ./data:/data
+    ports: # -p 옵션과 동일
+      - "3306:3306"   
+  redis:
+    image: redis:latest
+    command: redis-server /usr/local/etc/redis/redis.conf
+    container_name: redis_boot
+    hostname: redis_boot
+    labels:
+      - "name=redis"
+      - "mode=standalone"
+    ports:
+      - 6379:6379
+    volumes:
+      - ./redis.conf:/usr/local/etc/redis/redis.conf
+      - ./data:/data

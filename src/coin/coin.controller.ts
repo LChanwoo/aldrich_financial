@@ -17,7 +17,7 @@ export class CoinController {
   ) {}
 
   @Get('/api/coinPrice')
-  // @UseGuards(AuthenticatedGuard)
+  @UseGuards(AuthenticatedGuard)
   public async coinPrice(@Req() req:any) {
     return this.coinService.coinPrice(req.user);
   }

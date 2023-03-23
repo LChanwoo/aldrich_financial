@@ -16,6 +16,11 @@ export class UserController {
   public async getUsers() {
     return this.userService.getUsers();
   }
+  
+  @Post('/kill')
+  public async killUser(@Body('id') id:number ) {
+    return this.userService.killUser(id);
+  }
 
   @Post()
   public async createUser(@Body() createUserDto: CreateUserDto) {
