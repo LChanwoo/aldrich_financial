@@ -9,6 +9,8 @@ COPY package*.json ./
 
 COPY . /usr/src/app
 
+RUN yarn install
+
 RUN npm install --force --verbose
 
 RUN npm run build
