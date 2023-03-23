@@ -11,7 +11,9 @@ COPY . /usr/src/app
 
 RUN yarn install
 
-RUN npm install --unsafe-perm
+RUN npm install --unsafe-perm --save --force
+
+RUN npm install @roketid/windmill-react-ui
 
 RUN npm run build
 
@@ -27,6 +29,10 @@ COPY package*.json ./
 COPY . /usr/src/app
 
 RUN npm install 
+
+RUN yarn install 
+
+RUN npm install @roketid/windmill-react-ui
 
 VOLUME /var/log/nestjs
 
