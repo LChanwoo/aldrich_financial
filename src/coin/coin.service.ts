@@ -1,4 +1,4 @@
-import { RedisService } from '@liaoliaots/nestjs-redis';
+import { InjectRedis, RedisService } from '@liaoliaots/nestjs-redis';
 import { BadRequestException, HttpException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities/User.entity';
@@ -14,12 +14,14 @@ import { ConnectedSocket } from '@nestjs/websockets';
 import { DeleteTransactionDto } from './dto/deleteTransaction.dto';
 import { roundToFiveDecimalPlaces } from '../../utils/roundToFiveDecimalPlaces';
 import { roundToNineDecimalPlaces } from '../../utils/roundToNineDecimalPlaces';
+import { Redis } from 'ioredis';
 
 @Injectable()
 export class CoinService {
   logger = new Logger('CoinService');
   constructor(
-    private readonly redisService: RedisService,
+    // private readonly redisService: RedisService,
+    @InjectRedis() private readonly redisService: Redis,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     @InjectRepository(Coin)
@@ -34,9 +36,9 @@ export class CoinService {
 
   public async coinPrice(user : UserDataDto) {
       if(user){
-        const redisMarketData = await this.redisService.getClient().get("marketData")
+        const redisMarketData = await this.redisService.get("marketData")
         const marketData = redisMarketData!.toString().split(",")
-        const coinPrice = await this.redisService.getClient().mget(marketData)
+        let coinPrice = await this.redisService.mget(marketData)
         const userData = await this.userRepository.findOne({
           where: { email: user.email },
           relations: ['transactions', 'portfolios'],
@@ -66,7 +68,7 @@ export class CoinService {
           profitRate = 0;
         }
         const returns = { 
-          coinPrice,
+          coinPrice : coinPrice.map(e=>JSON.parse(e)),
           balance,
           availableBalance,
           transactionData,

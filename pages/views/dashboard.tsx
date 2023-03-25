@@ -77,7 +77,7 @@ function Dashboard(coinData) {
   )
 
   const [page, setPage] = useState(1)
-  const [data, setData] = useState<any>(coinData?.coinPrice?.map(e=>JSON.parse(e)))
+  const [data, setData] = useState<any>(coinData?.coinPrice)
   const [coin, setCoin] = useState("BTC")
   const [amount,setAmount] = useState(0)
   const [price,setPrice] = useState(0)
