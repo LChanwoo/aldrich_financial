@@ -25,7 +25,11 @@ export class WebSocketService {
 
         this.ws.on('message', async function (data : any) {
             const message = JSON.parse(data)
-            await redis.set(message.code, data)
+            if(message){
+                await redis.set(message.code, data)
+            }else{
+                console.log("이 메시지는 ",message)
+            }
         });
     }
 

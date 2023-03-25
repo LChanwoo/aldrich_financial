@@ -2631,6 +2631,11 @@
     "readable-stream" "^2.2.2"
     "typedarray" "^0.0.6"
 
+"connect-redis@^7.0.1":
+  "integrity" "sha512-xxyhus0nfPw96s0jI5fvRwGGYwJYISgVuJv40OSFV8N4l4ystNHZdoq0w90XhOGbsZTQJGc9Nwr6RnYsVZZv8w=="
+  "resolved" "https://registry.npmjs.org/connect-redis/-/connect-redis-7.0.1.tgz"
+  "version" "7.0.1"
+
 "consola@^2.15.0":
   "integrity" "sha512-9vAdYbHj6x2fLKC4+oPH0kFzY/orMZyG2Aj+kNylHxKGJ/Ed4dpNyAQYwJOdqO4zdM7XpVHmyejQDcQHrnuXbw=="
   "resolved" "https://registry.npmjs.org/consola/-/consola-2.15.3.tgz"
@@ -3428,7 +3433,7 @@
     "jest-message-util" "^29.5.0"
     "jest-util" "^29.5.0"
 
-"express-session@^1.17.3":
+"express-session@^1.17.3", "express-session@>=1":
   "integrity" "sha512-4+otWXlShYlG1Ma+2Jnn+xgKUZTMJ5QD3YvfilX3AcocOAbIkVylSWEklzALe/+Pu4qV6TYBj5GwOBFfdKqLBw=="
   "resolved" "https://registry.npmjs.org/express-session/-/express-session-1.17.3.tgz"
   "version" "1.17.3"

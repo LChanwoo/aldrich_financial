@@ -4,12 +4,16 @@ import Redis from 'ioredis';
 import { LocalAuthGuard } from './auth/auth.guard';
 import { AuthenticatedGuard } from './auth/authenticated.guard';
 import { SessionGuard } from './auth/session.guard';
+import { CoinService } from './coin/coin.service';
+import { User } from './common/decorators/user.decorator';
 import { HttpExceptionFilter } from './common/filters/http-exception.filter';
+import { UserDataDto } from './user/dto/userData.dto';
 
 @Controller()
 export class AppController {
 
   constructor(
+    private readonly coinService: CoinService,
   ){}
 
   @Get()
@@ -35,17 +39,19 @@ export class AppController {
   public chart() {
     return {};
   }
-  @Render('dashboard')
-  @Get('/dashboard')
-  @UseGuards(AuthenticatedGuard)
-  @UseFilters(new HttpExceptionFilter())
-  public dashboard(@Req() req:any) {
-    return {};
-  }
   @Render('create-account')
   @Get('/create-account')
   public createAccount() {
     return {};
+  }
+  
+  @Render('dashboard')
+  @Get('/dashboard')
+  @UseGuards(AuthenticatedGuard)
+  @UseFilters(new HttpExceptionFilter())
+  public dashboard(@Req() req:any, @User() user:UserDataDto) {
+    const props = this.coinService.coinPrice(user);
+    return { props };
   }
 
   @Render('news')

@@ -1,5 +1,5 @@
-import { RedisService } from '@liaoliaots/nestjs-redis';
-import { Injectable } from '@nestjs/common';
+import { InjectRedis, RedisService } from '@liaoliaots/nestjs-redis';
+import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression, CronOptions } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities/User.entity';
@@ -7,7 +7,8 @@ import { EntityManager, Repository } from 'typeorm';
 import { Portfolio } from '../entities/Portfolio.entity';
 import { Transaction } from '../entities/Transaction.entity';
 import { ConnectedSocket } from '@nestjs/websockets';
-
+import axios from "axios"
+import { Redis } from 'ioredis';
 interface CustomCronOptions extends CronOptions {
   concurrency?: number;
 }
@@ -15,8 +16,12 @@ interface CustomCronOptions extends CronOptions {
 
 @Injectable()
 export class TaskService {
+  
+  logger = new Logger(TaskService.name);
+
   constructor(
     private readonly redis : RedisService,
+    @InjectRedis() private readonly redis2: Redis,
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
     @InjectRepository(Transaction)
@@ -119,6 +124,16 @@ export class TaskService {
     // console.log(transactionData)
     // console.log('cron job is running every second');
     })
+  }
+
+  //1분마다
+  @Cron(CronExpression.EVERY_MINUTE)
+  async getMarketData() {
+    // this.logger.log('getMarketData')
+    const market = await axios.get('https://api.upbit.com/v1/market/all')
+    const marketData = await market.data.map((item:any)=>item.market).filter((item:any)=>item.includes('KRW'))
+    await this.redis2.set("marketData",marketData.toString())
+    // this.logger.log('getMarketData end')
   }
 
 }

@@ -1,5 +1,5 @@
 import { RedisService } from '@liaoliaots/nestjs-redis';
-import { BadRequestException, HttpException, Injectable } from '@nestjs/common';
+import { BadRequestException, HttpException, Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities/User.entity';
 import { Connection, EntityManager, Repository } from 'typeorm';
@@ -17,7 +17,7 @@ import { roundToNineDecimalPlaces } from '../../utils/roundToNineDecimalPlaces';
 
 @Injectable()
 export class CoinService {
-
+  logger = new Logger('CoinService');
   constructor(
     private readonly redisService: RedisService,
     @InjectRepository(User)
@@ -33,50 +33,54 @@ export class CoinService {
   ) { }
 
   public async coinPrice(user : UserDataDto) {
-      const redisMarketData = await this.redisService.getClient().get("marketData")
-      const marketData = redisMarketData!.toString().split(",")
-      const coinPrice = await this.redisService.getClient().mget(marketData)
-      const userData = await this.userRepository.findOne({
-        where: { email: user.email },
-        relations: ['transactions', 'portfolios'],
-      });
-      const transactionData = userData.transactions.filter((transaction) => transaction.doneAt === null); 
-      // console.log(userData)
-      const balance = userData.balance;
-      const availableBalance = userData.availableBalance;
-      const portfolioData = userData.portfolios.map((portfolio) => {
-          const currentPrice = JSON.parse(coinPrice[marketData.indexOf(portfolio.market)]).trade_price;
-          const evaluatedPrice = roundToFiveDecimalPlaces(+(portfolio.quantity * currentPrice));
-          return {
-            market: portfolio.market,
-            quantity: portfolio.quantity,
-            averagePrice: portfolio.averagePrice,
-            totalInvested: portfolio.totalInvested,
-            currentPrice: currentPrice,
-            profitRate: ((1-portfolio.totalInvested/evaluatedPrice)*100).toFixed(2),
-            evaluatedPrice: evaluatedPrice,
-            evaluatedGainAndLoss: +((portfolio.quantity * currentPrice) - portfolio.totalInvested).toFixed(8),
-          }
-      })
-      const totalPurchase = portfolioData.reduce((acc,cur)=> acc+ +cur.totalInvested,0)
-      const totalEvaluated = portfolioData.reduce((acc,cur)=>acc+ +cur.evaluatedPrice,0)
-      const totalGainAndLoss = totalEvaluated -totalPurchase
-      let profitRate = +((1-totalPurchase/totalEvaluated)*100).toFixed(2)
-      if(isNaN(profitRate)){
-        profitRate = 0;
+      if(user){
+        const redisMarketData = await this.redisService.getClient().get("marketData")
+        const marketData = redisMarketData!.toString().split(",")
+        const coinPrice = await this.redisService.getClient().mget(marketData)
+        const userData = await this.userRepository.findOne({
+          where: { email: user.email },
+          relations: ['transactions', 'portfolios'],
+        });
+        const transactionData = userData.transactions.filter((transaction) => transaction.doneAt === null); 
+        const balance = userData.balance;
+        const availableBalance = userData.availableBalance;
+        const portfolioData = userData.portfolios.map((portfolio) => {
+            const currentPrice = JSON.parse(coinPrice[marketData.indexOf(portfolio.market)]).trade_price;
+            const evaluatedPrice = roundToFiveDecimalPlaces(+(portfolio.quantity * currentPrice));
+            return {
+              market: portfolio.market,
+              quantity: portfolio.quantity,
+              averagePrice: portfolio.averagePrice,
+              totalInvested: portfolio.totalInvested,
+              currentPrice: currentPrice,
+              profitRate: ((1-portfolio.totalInvested/evaluatedPrice)*100).toFixed(2),
+              evaluatedPrice: evaluatedPrice,
+              evaluatedGainAndLoss: +((portfolio.quantity * currentPrice) - portfolio.totalInvested).toFixed(8),
+            }
+        })
+        const totalPurchase = portfolioData.reduce((acc,cur)=> acc+ +cur.totalInvested,0)
+        const totalEvaluated = portfolioData.reduce((acc,cur)=>acc+ +cur.evaluatedPrice,0)
+        const totalGainAndLoss = totalEvaluated -totalPurchase
+        let profitRate = +((1-totalPurchase/totalEvaluated)*100).toFixed(2)
+        if(isNaN(profitRate)){
+          profitRate = 0;
+        }
+        const returns = { 
+          coinPrice,
+          balance,
+          availableBalance,
+          transactionData,
+          portfolioData,
+          totalPurchase,
+          totalEvaluated,
+          totalGainAndLoss,
+          profitRate
+    
+        }
+        return returns;
       }
-    return { 
-      coinPrice,
-      balance,
-      availableBalance,
-      transactionData,
-      portfolioData,
-      totalPurchase,
-      totalEvaluated,
-      totalGainAndLoss,
-      profitRate
-
-     };
+      this.logger.log('no user')
+      return { coinPrice: [] };
   }
 
   public async deleteUserData(user: UserDataDto) {

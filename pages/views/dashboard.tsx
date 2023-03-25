@@ -65,7 +65,6 @@ interface HTMLDivElementWithAlign extends HTMLAttributes<HTMLDivElement> {
 const localeStringOptions = { minimumFractionDigits: 0, maximumFractionDigits: 8 };
 
 function Dashboard(coinData) {
-  // console.log(coindData.coinData.coinPrice)
   Chart.register(
     ArcElement,
     CategoryScale,
@@ -78,22 +77,22 @@ function Dashboard(coinData) {
   )
 
   const [page, setPage] = useState(1)
-  const [data, setData] = useState<any>(coinData.coinPrice.map(e=>JSON.parse(e)))
+  const [data, setData] = useState<any>(coinData?.coinPrice?.map(e=>JSON.parse(e)))
   const [coin, setCoin] = useState("BTC")
   const [amount,setAmount] = useState(0)
   const [price,setPrice] = useState(0)
   const [tmpPrice,setTmpPrice] = useState(0);
   const [totalPrice,setTotalPrice] = useState(0)
   const [select,setSelect] = useState("매수")
-  const [balance,setBalance] = useState(coinData.balance)
-  const [availableBalance,setAvailableBalance] = useState(coinData.availableBalance)
-  const [totalPurchase, setTotalPurchase] = useState(coinData.totalPurchase)
-  const [totalValue, setTotalValue] = useState (coinData.totalEvaluated)
-  const [gainsAndLoses,setGainsAndLoses] = useState(coinData.totalGainAndLoss)
-  const [profitRate,setProfitRate] = useState(coinData.profitRate)
+  const [balance,setBalance] = useState(coinData?.balance)
+  const [availableBalance,setAvailableBalance] = useState(coinData?.availableBalance)
+  const [totalPurchase, setTotalPurchase] = useState(coinData?.totalPurchase)
+  const [totalValue, setTotalValue] = useState (coinData?.totalEvaluated)
+  const [gainsAndLoses,setGainsAndLoses] = useState(coinData?.totalGainAndLoss)
+  const [profitRate,setProfitRate] = useState(coinData?.profitRate)
   const [totalAsset,setTotalAsset] = useState(+balance+ +totalValue)
-  const [portfolioData,setPortfolioData] = useState(coinData.portfolioData)
-  const [transactionData,setTransactionData] = useState(coinData.transactionData)
+  const [portfolioData,setPortfolioData] = useState(coinData?.portfolioData)
+  const [transactionData,setTransactionData] = useState(coinData?.transactionData)
   const [cancleData,setCancleData] = useState("")
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -268,16 +267,20 @@ function Dashboard(coinData) {
       console.log('Socket disconnected');
     });
     // 코인 가격 정보를 받으면, 화면에 업데이트합니다.
-    socket.on('coinPriceUpdate', (data) => {
-      const response = data.map((item:any)=>JSON.parse(item!.toString()))
+    socket.on('coinPriceUpdate', (coinPriceData) => {
+      if(!coinPriceData){
+        console.log("coinPriceData is null")
+        return;
+      }
+      const response = coinPriceData;
       setData(response); 
       const newPortfolioData = portfolioData.map((item:any)=>{
-        const newPrice = response.find((d:any)=>d.code===item.market).trade_price
-        const newEvaluatedPrice = newPrice* +item.quantity
+        const newPrice = +response.find((d:any)=>d.code===item.market).trade_price
+        const newEvaluatedPrice = +newPrice* +item.quantity
         return {
           ...item,
           evaluatedPrice: roundToFiveDecimalPlaces(+newEvaluatedPrice),
-          evaluatedGainAndLoss:roundToFiveDecimalPlaces( newEvaluatedPrice - +item.totalInvested),
+          evaluatedGainAndLoss:roundToFiveDecimalPlaces(+newEvaluatedPrice - +item.totalInvested),
           profitRate:Math.round(((newEvaluatedPrice - +item.totalInvested)/+item.totalInvested)*10000)/100
         }
       });
@@ -374,7 +377,7 @@ function Dashboard(coinData) {
       </div>
       <div className='sm:flex sm:w-full sm:flex-row '>
         <div className=" lg:w-1/2 w-full " >
-        <TableContainer>
+        <TableContainer className='pointer-events-none'>
           <Table>
             <TableHeader>
               <tr className=''>
@@ -384,26 +387,26 @@ function Dashboard(coinData) {
               </tr>
             </TableHeader>
             <TableBody>
-            {data.map((user, i) => (
-                <TableRow key={i} id={user.code} onClick={onChangeCoin}>
+            {data?.map((user, i) => (
+                <TableRow key={i} id={user?.code} onClick={onChangeCoin}>
                   <TableCell>
                     <div className="flex items-center text-sm">
-                      <div>
-                        <p className="font-semibold">{user.code.replace("KRW-","")}</p>
+                     <div>
+                        <p className="font-semibold">{user?.code.replace("KRW-","")}</p>
                         <p className="text-xs text-gray-600 dark:text-gray-400">
                         </p>
                       </div>
                     </div>
                   </TableCell>
                   <TableCell>
-                    <span className="text-sm">{user.trade_price.toLocaleString()} KRW</span>
+                    <span className="text-sm">{user?.trade_price.toLocaleString()} KRW</span>
                   </TableCell>
                   <TableCell>
                     <Badge type={
-                      user.trade_price/user.prev_closing_price - 1 > 0?'success'
-                      : 1 - user.trade_price/user.prev_closing_price - 1 < 0?'danger'
+                      user?.trade_price/user?.prev_closing_price - 1 > 0?'success'
+                      : 1 - user?.trade_price/user?.prev_closing_price - 1 < 0?'danger'
                       : 'neutral'
-                      }>{(user.trade_price/user.prev_closing_price*100-100).toFixed(2)}%</Badge>
+                      }>{(user?.trade_price/user?.prev_closing_price*100-100).toFixed(2)}%</Badge>
                   </TableCell>
                 </TableRow>
               ))}
@@ -664,31 +667,32 @@ function Dashboard(coinData) {
 
 export const getServerSideProps = async (ctx) => {
   try{
-      const res = await axios.get('http://aldnancial.store/api/coinPrice', {
-          headers: { Cookie: ctx.req.headers.cookie, cookie: ctx.req.headers.cookie },
-      });
-      let {
-        coinPrice, 
-        balance, 
-        availableBalance, 
-        transactionData, 
-        portfolioData,
-        totalEvaluated,
-        totalPurchase,
-        totalGainAndLoss,
-        profitRate
-      } = res.data
-      const props ={
-        coinPrice,
-        balance,
-        availableBalance,
-        transactionData,
-        portfolioData,
-        totalEvaluated,
-        totalPurchase,
-        totalGainAndLoss,
-        profitRate
-      }
+    const props = ctx.query.props
+      // const res = await axios.get('http://aldnancial.store/api/coinPrice', {
+      //     headers: { Cookie: ctx.req.headers.cookie, cookie: ctx.req.headers.cookie },
+      // });
+      // let {
+      //   coinPrice, 
+      //   balance, 
+      //   availableBalance, 
+      //   transactionData, 
+      //   portfolioData,
+      //   totalEvaluated,
+      //   totalPurchase,
+      //   totalGainAndLoss,
+      //   profitRate
+      // } = res.data
+      // const props ={
+      //   coinPrice,
+      //   balance,
+      //   availableBalance,
+      //   transactionData,
+      //   portfolioData,
+      //   totalEvaluated,
+      //   totalPurchase,
+      //   totalGainAndLoss,
+      //   profitRate
+      // }
       return { props }
   }catch(e: any){
       return console.log(e.data)

@@ -41,7 +41,7 @@ function Charts({chartLegends, chartPercentage, backgroundColor}) {
         label: 'data',
       },
     ],
-    labels : chartLegends.map((legend)=>legend.title),
+    labels : chartLegends?.map((legend)=>legend.title),
   },
   options: {
     responsive: true,
