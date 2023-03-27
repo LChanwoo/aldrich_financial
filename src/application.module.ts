@@ -49,4 +49,6 @@ import { News } from './entities/News.entity';
   controllers: [AppController],
   providers: [],
 })
-export class AppModule {}
+export class AppModule {
+  
+}

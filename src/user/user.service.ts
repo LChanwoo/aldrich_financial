@@ -6,11 +6,19 @@ import { InjectRepository } from '@nestjs/typeorm';
 import bcrypt from 'bcrypt';
 import { RedisService } from '@liaoliaots/nestjs-redis';
 import { getColorByIndex } from '../../utils/getColorByIndex';
+import { Coin } from '../entities/Coin.entity';
+import { Transaction } from '../entities/Transaction.entity';
+import { getConnection } from 'typeorm';
 @Injectable()
 export class UserService {
   constructor(
+    
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
+    @InjectRepository(Coin)
+    private readonly coinRepository: Repository<Coin>,
+    @InjectRepository(Transaction)
+    private readonly transactionRepository: Repository<Transaction>,
     private readonly redis : RedisService
   ) {}
 
@@ -19,8 +27,21 @@ export class UserService {
   }
   public async killUser(id: number) {
     const user = await this.userRepository.findOne({ where: { id } });
+    
     return this.userRepository.remove(user);
   }
+
+  public async killAllUser() {
+    try{
+      await this.transactionRepository.delete({});
+      await this.coinRepository.delete({});
+      await this.userRepository.delete({});  
+      return true;
+    }catch(e){
+      return console.log(e)
+      
+    }
+    }
 
   public async createUser(createUserDto: CreateUserDto) {
     const user = new User();

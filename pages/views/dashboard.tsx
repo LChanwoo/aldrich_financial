@@ -377,7 +377,7 @@ function Dashboard(coinData) {
       </div>
       <div className='sm:flex sm:w-full sm:flex-row '>
         <div className=" lg:w-1/2 w-full " >
-        <TableContainer className='pointer-events-none'>
+        <TableContainer >
           <Table>
             <TableHeader>
               <tr className=''>

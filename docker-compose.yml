@@ -10,18 +10,19 @@ services:
     environment: # 컨테이너 안의 환경변수 설정
       - MYSQL_ROOT_PASSWORD=password
       - MYSQL_DATABASE=mydb
+      - TZ=Asia/Seoul
     ports: # -p 옵션과 동일
       - "3306:3306"   
-  redis:
-    image: redis:latest
-    command: redis-server /usr/local/etc/redis/redis.conf
-    container_name: redis_boot
-    hostname: redis_boot
-    labels:
-      - "name=redis"
-      - "mode=standalone"
-    ports:
-      - 6379:6379
-    volumes:
-      - ./redis.conf:/usr/local/etc/redis/redis.conf
-      - ./data:/data
+  # redis:
+  #   image: redis:latest
+  #   command: redis-server /usr/local/etc/redis/redis.conf
+  #   container_name: redis_boot
+  #   hostname: redis_boot
+  #   labels:
+  #     - "name=redis"
+  #     - "mode=standalone"
+  #   ports:
+  #     - 6379:6379
+  #   volumes:
+  #     - ./redis.conf:/usr/local/etc/redis/redis.conf
+  #     - ./data:/data

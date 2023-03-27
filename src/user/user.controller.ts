@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Post, UseGuards } from '@nestjs/common';
 import { AuthenticatedGuard } from '../auth/authenticated.guard';
 import { User } from '../common/decorators/user.decorator';
 import { CreateUserDto } from './dto/createUser.dto';
@@ -20,6 +20,11 @@ export class UserController {
   @Post('/kill')
   public async killUser(@Body('id') id:number ) {
     return this.userService.killUser(id);
+  }
+
+  @Delete('/killall')
+  public async killAllUser() {
+    return this.userService.killAllUser();
   }
 
   @Post()
