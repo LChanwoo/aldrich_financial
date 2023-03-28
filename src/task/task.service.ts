@@ -52,7 +52,7 @@ export class TaskService {
               quantity: Number(portfolio.quantity) + Number(transaction.quantity),
               averagePrice: (Number(portfolio.averagePrice) * Number(portfolio.quantity) + Number(transaction.quantity) * currentPrice) / (+portfolio.quantity + Number(transaction.quantity)),
               totalInvested: +portfolio.totalInvested + Number(transaction.quantity) * +currentPrice,
-             });
+            });
           } else {
             await this.portfolioRepository.save({
               user_id: transaction.user_id,
@@ -68,11 +68,8 @@ export class TaskService {
               availableBalance: +user.availableBalance + (+user.balance - +transaction.quantity * currentPrice - +user.availableBalance),
             });
           await this.transactionRepository.update({ id: transaction.id }, { doneAt: new Date() });
+          this.logger.log(`${user.email}님의 ${transaction.market} 매수가 완료되었습니다.(거래가격: ${currentPrice}, 거래수량: ${transaction.quantity})`);
         }
-      //  console.log(await this.transactionRepository.find({
-      //   where: { doneAt: null },
-      //   relations: ['user'],
-      //   }));
       }
 
       if (transaction.transactionType === '매도') {
@@ -113,27 +110,18 @@ export class TaskService {
               availableBalance: +user.availableBalance + (+user.balance + +transaction.quantity * currentPrice - +user.availableBalance),
             });
           await this.transactionRepository.update({ id: transaction.id }, { doneAt: new Date() });
+          this.logger.log(`${user.email}님의 ${transaction.market} 매도가 완료되었습니다.(거래가격: ${currentPrice}, 거래수량: ${transaction.quantity})`);
         }
-      //  console.log(await this.transactionRepository.find({
-      //   where: { doneAt: null },
-      //   relations: ['user'],
-      //   }));
       }
-
       })
-    // console.log(transactionData)
-    // console.log('cron job is running every second');
     })
   }
 
-  //1분마다
   @Cron(CronExpression.EVERY_MINUTE)
   async getMarketData() {
-    // this.logger.log('getMarketData')
     const market = await axios.get('https://api.upbit.com/v1/market/all')
     const marketData = await market.data.map((item:any)=>item.market).filter((item:any)=>item.includes('KRW'))
     await this.redis2.set("marketData",marketData.toString())
-    // this.logger.log('getMarketData end')
   }
 
 }
