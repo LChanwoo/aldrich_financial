@@ -1,6 +1,6 @@
 import { InjectRedis, RedisService } from '@liaoliaots/nestjs-redis';
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression, CronOptions } from '@nestjs/schedule';
+import { Cron, CronExpression, CronOptions, Interval } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../entities/User.entity';
 import { EntityManager, Repository } from 'typeorm';
@@ -31,7 +31,8 @@ export class TaskService {
     private readonly entityManager: EntityManager,
 
   ) {}
-  @Cron(CronExpression.EVERY_SECOND)
+  // @Cron(CronExpression.EVERY_SECOND)
+  @Interval(500)
   async handleCron() {
     const transactionData = await this.transactionRepository.createQueryBuilder('transaction')
       .leftJoinAndSelect('transaction.user', 'user')
