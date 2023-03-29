@@ -288,7 +288,7 @@ function Dashboard(coinData) {
       setPortfolioData(newPortfolioData)
       setTotalValue(newTotalValue)
       setGainsAndLoses( newPortfolioData.reduce((acc:any,cur:any)=>acc+ +cur.evaluatedGainAndLoss,0))
-      setProfitRate(Math.round((newPortfolioData.reduce((acc:any,cur:any)=>acc+ +cur.evaluatedGainAndLoss,0)/newPortfolioData.reduce((acc:any,cur:any)=>acc+ +cur.totalInvested,0))*10000)/100)
+      setProfitRate(isNaN(Math.round((newPortfolioData.reduce((acc:any,cur:any)=>acc+ +cur.evaluatedGainAndLoss,0)/newPortfolioData.reduce((acc:any,cur:any)=>acc+ +cur.totalInvested,0))*10000)/100)? 0 : Math.round((newPortfolioData.reduce((acc:any,cur:any)=>acc+ +cur.evaluatedGainAndLoss,0)/newPortfolioData.reduce((acc:any,cur:any)=>cur.totalInvested,0))*10000)/100)
       setTotalAsset(+newTotalValue+ +balance)
     });
     return () => {
