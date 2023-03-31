@@ -9,7 +9,8 @@
     "build:ui": "npx next build --no-lint",
     "build:server": "npx tsc --project tsconfig.server.json && npx babel .next/production-server -d .next/production-server --extensions \".js\"",
     "build": "yarn build:clean && yarn build:ui && yarn build:server",
-    "start": "cross-env NODE_ENV=production node .next/production-server/src/main.js "
+    "start": "cross-env NODE_ENV=production node .next/production-server/src/main.js ",
+    "test" : "jest"
   },
   "dependencies": {
     "@liaoliaots/nestjs-redis": "^9.0.5",
@@ -77,10 +78,12 @@
     "@typescript-eslint/eslint-plugin": "^5.19.0",
     "@typescript-eslint/parser": "^5.19.0",
     "autoprefixer": "^10.4.2",
+    "chai": "^4.3.7",
     "cssnano": "^5.0.12",
     "eslint": "^8.13.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-plugin-prettier": "^4.0.0",
+    "mocha": "^10.2.0",
     "nodemon": "^2.0.15",
     "postcss": "^8.4.6",
     "prettier": "^2.6.2",
