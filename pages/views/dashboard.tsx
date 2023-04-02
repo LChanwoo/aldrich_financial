@@ -387,7 +387,7 @@ function Dashboard(coinData) {
               </tr>
             </TableHeader>
             <TableBody>
-            {data?.map((user, i) => (
+            {data?.filter(e=> e!==null).map((user, i) => (
                 <TableRow key={i} id={user?.code} onClick={onChangeCoin}>
                   <TableCell>
                     <div className="flex items-center text-sm">

@@ -10,7 +10,7 @@
     "build:server": "npx tsc --project tsconfig.server.json && npx babel .next/production-server -d .next/production-server --extensions \".js\"",
     "build": "yarn build:clean && yarn build:ui && yarn build:server",
     "start": "cross-env NODE_ENV=production node .next/production-server/src/main.js ",
-    "test" : "jest"
+    "test": "jest"
   },
   "dependencies": {
     "@liaoliaots/nestjs-redis": "^9.0.5",
@@ -26,6 +26,7 @@
     "@nestjs/websockets": "^9.3.9",
     "axios": "^1.3.4",
     "bcrypt": "^5.1.0",
+    "bcryptjs": "^2.4.3",
     "cache-manager": "^5.1.7",
     "cache-manager-ioredis": "^2.1.0",
     "cheerio": "^1.0.0-rc.12",
@@ -64,6 +65,7 @@
     "@roketid/windmill-react-ui": "^0.1.1",
     "@svgr/webpack": "^6.5.1",
     "@types/bcrypt": "^5.0.0",
+    "@types/bcryptjs": "^2.4.2",
     "@types/cache-manager-ioredis": "^2.0.3",
     "@types/chart.js": "2.9.37",
     "@types/cookie-parser": "^1.4.3",

@@ -3,12 +3,12 @@ import { User } from '../entities/User.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './dto/createUser.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import { RedisService } from '@liaoliaots/nestjs-redis';
 import { getColorByIndex } from '../../utils/getColorByIndex';
 import { Coin } from '../entities/Coin.entity';
 import { Transaction } from '../entities/Transaction.entity';
-import { getConnection } from 'typeorm';
+
 @Injectable()
 export class UserService {
   constructor(
