@@ -24,8 +24,7 @@ export class CoinController {
 
   @Post('/api/order')
   @UseFilters(new HttpExceptionFilter())
-  // @UseGuards(AuthenticatedGuard)
-  public async order(@Body() transactionDto: TransactionDto ,@User() user:UserDataDto){
+    public async order(@Body() transactionDto: TransactionDto ,@User() user:UserDataDto){
     return this.coinService.order(transactionDto, user);
   }
 
