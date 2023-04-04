@@ -63,10 +63,10 @@ export class CoinService {
         const totalPurchase = portfolioData.reduce((acc,cur)=> acc+ +cur.totalInvested,0)
         const totalEvaluated = portfolioData.reduce((acc,cur)=>acc+ +cur.evaluatedPrice,0)
         const totalGainAndLoss = totalEvaluated -totalPurchase
-        let profitRate = +((1-totalPurchase/totalEvaluated)*100).toFixed(2)
-        if(isNaN(profitRate)){
-          profitRate = 0;
-        }
+        let profitRate = +isNaN(Math.round((portfolioData.reduce((acc:any,cur:any)=>acc+ +cur.evaluatedGainAndLoss,0)/portfolioData.reduce((acc:any,cur:any)=>acc+ +cur.totalInvested,0))*10000)/100)? 0 : Math.round((portfolioData.reduce((acc:any,cur:any)=>acc+ +cur.evaluatedGainAndLoss,0)/portfolioData.reduce((acc:any,cur:any)=>cur.totalInvested,0))*10000)/100
+        // if(isNaN(profitRate)){
+        //   profitRate = 0;
+        // }
         const returns = { 
           coinPrice : coinPrice.map(e=>JSON.parse(e)),
           balance,
@@ -114,11 +114,9 @@ export class CoinService {
         const userData = await manager.findOne(User, {where:{ email: user.email },  relations: ['transactions', 'portfolios'] });
         const availableBalance = userData.availableBalance;
         const coinPrice = roundToFiveDecimalPlaces(+body.price);
-        console.log('coinPrice', coinPrice);
         const coinAmount = roundToNineDecimalPlaces(+body.amount);
-        console.log('coinAmount', coinAmount);
+        // Calculate the total price of the coins
         const totalPrice = roundToFiveDecimalPlaces(coinPrice * coinAmount);
-        console.log('totalPrice', totalPrice);
         if (totalPrice > availableBalance) {
           throw new BadRequestException('잔액이 부족합니다.');
         }
