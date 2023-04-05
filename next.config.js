@@ -1,6 +1,8 @@
 /** @type {import('next').NextConfig} */
+
+
 module.exports = {
-  reactStrictMode: false,
+  reactStrictMode: true,
   webpack(config) {
     config.module.rules.push({
       test: /\.svg$/i,
@@ -20,5 +22,31 @@ module.exports = {
     ]
   },
   serverRuntimeConfig: {},
-  publicRuntimeConfig: {},
+  publicRuntimeConfig: {
+    basePath: process.env.BASE_PATH || '',
+  },
+  head: {
+    link: {
+      rel: 'shortcut icon',
+      href: '/favicon.ico'
+    }
+  },
+//   async headers() {
+//     return [
+//       {
+//         source: '/favicon1.ico',
+//         headers: [
+//           {
+//             key: 'Cache-Control',
+//             value: 'public, max-age=604800, immutable',
+//           },
+//         ],
+//       },
+//     ]
+//   },
+//   head: {
+//   link: [
+//     { rel: 'icon', type: 'image/x-icon', href: '/favicon1.ico' }
+//   ]
+// }
 }
