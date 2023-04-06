@@ -62,7 +62,7 @@ import SectionTitle from 'example/components/Typography/SectionTitle'
 interface HTMLDivElementWithAlign extends HTMLAttributes<HTMLDivElement> {
   align?: string;
 }
-const localeStringOptions = { minimumFractionDigits: 0, maximumFractionDigits: 8 };
+export const localeStringOptions = { minimumFractionDigits: 0, maximumFractionDigits: 8 };
 
 function Dashboard(coinData) {
   Chart.register(
@@ -529,7 +529,7 @@ function Dashboard(coinData) {
           </Modal>
         </div>
         <PageTitle>보유자산</PageTitle>
-        <TableContainer>
+        <TableContainer style={{overflow : "scroll"}}>
           <Table>
             <TableHeader>
               <tr className='w-full'>
@@ -613,8 +613,8 @@ function Dashboard(coinData) {
             /> */}
           </TableFooter>
         </TableContainer>
-                <PageTitle>미체결 거래</PageTitle>
-        <TableContainer>
+        <PageTitle>미체결 거래</PageTitle>
+        <TableContainer style={{overflow : "scroll"}}>
           <Table>
             <TableHeader>
               <tr className='text-xs lg:text-base'>

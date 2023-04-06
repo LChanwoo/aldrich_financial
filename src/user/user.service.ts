@@ -8,6 +8,7 @@ import { RedisService } from '@liaoliaots/nestjs-redis';
 import { getColorByIndex } from '../../utils/getColorByIndex';
 import { Coin } from '../entities/Coin.entity';
 import { Transaction } from '../entities/Transaction.entity';
+import { roundToFiveDecimalPlaces } from '../../utils/roundToFiveDecimalPlaces';
 
 @Injectable()
 export class UserService {
@@ -94,6 +95,23 @@ export class UserService {
       relations: ['transactions', 'portfolios'],
     });
     if (userInfo) {
+      const redisMarketData = await this.redis.getClient().get("marketData")
+      const marketData = redisMarketData!.toString().split(",")
+      const coinPrice = await this.redis.getClient().mget(marketData)
+      const portfolioData = userInfo.portfolios.map((portfolio) => {
+          const currentPrice = JSON.parse(coinPrice[marketData.indexOf(portfolio.market)]).trade_price;
+          const evaluatedPrice = roundToFiveDecimalPlaces(+(portfolio.quantity * currentPrice));
+          return {
+            market: portfolio.market,
+            quantity: portfolio.quantity,
+            averagePrice: portfolio.averagePrice,
+            totalInvested: portfolio.totalInvested,
+            currentPrice: currentPrice,
+            profitRate: ((1-portfolio.totalInvested/evaluatedPrice)*100).toFixed(2),
+            evaluatedPrice: evaluatedPrice,
+            evaluatedGainAndLoss: +((portfolio.quantity * currentPrice) - portfolio.totalInvested).toFixed(8),
+          }
+      })
       if(userInfo.portfolios.length === 0){
         return [];
       }
@@ -125,10 +143,15 @@ export class UserService {
         backgroundColor[9] = getColorByIndex(9);
         chartLegends[9] = {title:'기타', color:getColorByIndex(9) };
       }
+      const now = new Date();
+      // YYYY-MM-DD hh:mm:ss로 변환
+      const nowDate = now.toISOString().substr(0, 10);
       const chartData = {
         chartLegends,
         chartPercentage,
         backgroundColor,
+        portfolioData,
+        nowDate,
       };
       return chartData;
     }
