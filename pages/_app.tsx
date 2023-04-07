@@ -12,6 +12,7 @@ function MyApp({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
+        <title>aldrich financial</title>
         <link rel="shortcut icon" href="https://aldrich-portfolio-blog2.vercel.app/favicon1.ico" />
         <meta name="description" content="this is aldrich financial" />
         <meta name="og:title" content="aldrich financial" />
