@@ -54,6 +54,14 @@ export class AppController {
     return { props };
   }
 
+  @Render('myhistory')
+  @Get('/myhistory')
+  @UseGuards(AuthenticatedGuard)
+  @UseFilters(new HttpExceptionFilter())
+  public myhistory(@Req() req:any, @User() user:UserDataDto) {
+    const props = this.coinService.myTransaction(user);
+    return { props };
+  }
   @Render('news')
   @Get('/news')
   @UseGuards(AuthenticatedGuard)

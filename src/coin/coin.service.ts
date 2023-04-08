@@ -85,6 +85,17 @@ export class CoinService {
       return { coinPrice: [] };
   }
 
+  public async myTransaction(user: UserDataDto) {
+    const userData = await this.userRepository.findOne({
+      where: { email: user.email },
+      relations: ['transactions', 'portfolios'],
+    });
+    const transactionData = userData.transactions.filter((transaction) => transaction.doneAt !== null);
+    const sellData = transactionData.filter((transaction) => transaction.transactionType === '매도');
+    const buyData = transactionData.filter((transaction) => transaction.transactionType === '매수');
+    return { sellData, buyData };
+  }
+
   public async deleteUserData(user: UserDataDto) {
     const userData = await this.userRepository.findOne({
       where: { email: user.email },

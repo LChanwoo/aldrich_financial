@@ -36,6 +36,11 @@ const routes: IRoute[] = [
     name: '포트폴리오',
   },
   {
+    path: '/myhistory',
+    icon: 'ChartsIcon',
+    name: '내거래기록',
+  },
+  {
     path: '/ranking',
     icon: 'CardsIcon',
     name: '투자순위',

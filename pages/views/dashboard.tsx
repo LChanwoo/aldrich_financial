@@ -668,34 +668,9 @@ function Dashboard(coinData) {
 export const getServerSideProps = async (ctx) => {
   try{
     const props = ctx.query.props
-      // const res = await axios.get('http://aldnancial.store/api/coinPrice', {
-      //     headers: { Cookie: ctx.req.headers.cookie, cookie: ctx.req.headers.cookie },
-      // });
-      // let {
-      //   coinPrice, 
-      //   balance, 
-      //   availableBalance, 
-      //   transactionData, 
-      //   portfolioData,
-      //   totalEvaluated,
-      //   totalPurchase,
-      //   totalGainAndLoss,
-      //   profitRate
-      // } = res.data
-      // const props ={
-      //   coinPrice,
-      //   balance,
-      //   availableBalance,
-      //   transactionData,
-      //   portfolioData,
-      //   totalEvaluated,
-      //   totalPurchase,
-      //   totalGainAndLoss,
-      //   profitRate
-      // }
-      return { props }
+    return { props }
   }catch(e: any){
-      return console.log(e.data)
+    return console.log(e.data)
   }
 }
 
