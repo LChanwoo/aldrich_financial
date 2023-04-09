@@ -46,9 +46,16 @@ function MyHistory(props :any) {
               <tr className='w-full'>
                 <TableCell >구분</TableCell>
                 <TableCell >종목</TableCell>
-                <TableCell >가격</TableCell>
-                <TableCell >수량</TableCell>
-                <TableCell >총금액</TableCell>
+                <TableCell >
+                  가격
+                  <br/>
+                  수량
+                  </TableCell>
+                <TableCell >
+                  총금액
+                  <br/>
+                  거래시간
+                </TableCell>
               </tr>
             </TableHeader>
             <TableBody>
@@ -59,16 +66,15 @@ function MyHistory(props :any) {
                       <span className="text-sm">{data?.transactionType}</span>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm">{data?.coin}</span>
+                      <span className="text-sm">{data?.market}</span>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm">{data?.price}</span>
-                    </TableCell>
-                    <TableCell>
+                      <span className="text-sm">{data?.price}</span><br/>
                       <span className="text-sm">{data?.quantity}</span>
                     </TableCell>
                     <TableCell>
-                      <span className="text-sm">{data?.totalPrice}</span>
+                      <span className="text-sm">{data?.totalPrice}</span><br/>
+                      <span className="text-sm">{data?.doneAt}</span>
                     </TableCell>
                   </TableRow>
                 )

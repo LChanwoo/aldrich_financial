@@ -15,6 +15,7 @@ import { DeleteTransactionDto } from './dto/deleteTransaction.dto';
 import { roundToFiveDecimalPlaces } from '../../utils/roundToFiveDecimalPlaces';
 import { roundToNineDecimalPlaces } from '../../utils/roundToNineDecimalPlaces';
 import { Redis } from 'ioredis';
+import { convertDate } from '../../utils/convertDate';
 
 @Injectable()
 export class CoinService {
@@ -91,8 +92,27 @@ export class CoinService {
       relations: ['transactions', 'portfolios'],
     });
     const transactionData = userData.transactions.filter((transaction) => transaction.doneAt !== null);
-    const sellData = transactionData.filter((transaction) => transaction.transactionType === '매도');
-    const buyData = transactionData.filter((transaction) => transaction.transactionType === '매수');
+    const sellData = transactionData.filter((transaction) => transaction.transactionType === '매도').map((transaction) => {
+      return {
+        market: transaction.market,
+        transactionType: transaction.transactionType,
+        price: transaction.price,
+        quantity: transaction.quantity,
+        doneAt: convertDate(transaction.doneAt.toDateString()),
+        totalPrice: transaction.totalPrice,
+      }
+    });
+    const buyData = transactionData.filter((transaction) => transaction.transactionType === '매수').map((transaction) => {
+      return {
+        market: transaction.market,
+        transactionType: transaction.transactionType,
+        price: transaction.price,
+        quantity: transaction.quantity,
+        doneAt: convertDate(transaction.doneAt.toDateString()),
+        totalPrice: transaction.totalPrice,
+        };
+    });
+    console.log(buyData)
     return { sellData, buyData };
   }
 
