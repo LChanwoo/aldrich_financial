@@ -44,9 +44,19 @@ function MyHistory(props :any) {
           <Table>
             <TableHeader>
               <tr className='w-full'>
-                <TableCell >구분</TableCell>
-                <TableCell >종목</TableCell>
-                <TableCell >
+                <TableCell style={{ textAlign: 'center' }} >구분</TableCell>
+                <TableCell style={{ textAlign: 'center' }}>종목</TableCell>
+                <TableCell className='flex flex-grow'>
+                  <div className='flex flex-col w-full'>
+                    <div style={{ textAlign: 'center' }}  className="m-1" >가격</div>
+                    <div style={{ textAlign: 'center' }}  className="m-1">수량</div>
+                  </div>   
+                  <div className='flex flex-col w-full'>
+                    <div style={{ textAlign: 'center' }}  className="m-1">총금액</div>
+                    <div style={{ textAlign: 'center' }}  className="m-1">거래시간</div>
+                  </div>
+                </TableCell>
+                {/* <TableCell >
                   가격
                   <br/>
                   수량
@@ -55,27 +65,37 @@ function MyHistory(props :any) {
                   총금액
                   <br/>
                   거래시간
-                </TableCell>
+                </TableCell> */}
               </tr>
             </TableHeader>
             <TableBody>
               {props.buyData?.map((data: any, index: number) => {
                 return (
                   <TableRow key={index}>
-                    <TableCell>
-                      <span className="text-sm">{data?.transactionType}</span>
+                    <TableCell style={{ textAlign: 'center' }}>
+                      <span className="text-sm text-green-400"  >{data?.transactionType}</span>
                     </TableCell>
-                    <TableCell>
-                      <span className="text-sm">{data?.market}</span>
+                    <TableCell style={{ textAlign: 'center' }}>
+                      <span className="text-sm"  >{data?.market}</span>
                     </TableCell>
-                    <TableCell>
+                    <TableCell className='flex flex-grow'>
+                      <div className='flex flex-col w-full'>
+                        <div style={{ textAlign: 'center' }}  className="m-1" >{data?.price}</div>
+                        <div style={{ textAlign: 'center' }}  className="m-1">{data?.quantity}</div>
+                      </div>   
+                      <div className='flex flex-col w-full'>
+                        <div style={{ textAlign: 'center' }}  className="m-1">{data?.totalPrice}</div>
+                        <div style={{ textAlign: 'center' }}  className="m-1">{data?.doneAt}</div>
+                      </div>
+                    </TableCell>
+                    {/* <TableCell>
                       <span className="text-sm">{data?.price}</span><br/>
                       <span className="text-sm">{data?.quantity}</span>
                     </TableCell>
                     <TableCell>
                       <span className="text-sm">{data?.totalPrice}</span><br/>
                       <span className="text-sm">{data?.doneAt}</span>
-                    </TableCell>
+                    </TableCell> */}
                   </TableRow>
                 )
               }

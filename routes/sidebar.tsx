@@ -38,7 +38,7 @@ const routes: IRoute[] = [
   {
     path: '/myhistory',
     icon: 'ChartsIcon',
-    name: '내거래기록',
+    name: '내거래내역',
   },
   {
     path: '/ranking',
