@@ -137,7 +137,7 @@ function MyHistory(props :any) {
                 return (
                   <TableRow key={index}>
                     <TableCell style={{ textAlign: 'center' }}>
-                      <span className="text-sm text-green-400"  >{data?.transactionType}</span>
+                      <span className="text-sm text-red-400"  >{data?.transactionType}</span>
                     </TableCell>
                     <TableCell style={{ textAlign: 'center' }}>
                       <span className="text-sm"  >{data?.market}</span>
