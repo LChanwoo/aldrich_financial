@@ -80,11 +80,11 @@ function MyHistory(props :any) {
                     </TableCell>
                     <TableCell className='flex flex-grow'>
                       <div className='flex flex-col w-full'>
-                        <div style={{ textAlign: 'center' }}  className="m-1" >{data?.price}</div>
-                        <div style={{ textAlign: 'center' }}  className="m-1">{data?.quantity}</div>
+                        <div style={{ textAlign: 'center' }}  className="m-1" >{(+data?.price).toLocaleString('ko-KR',localeStringOptions)}</div>
+                        <div style={{ textAlign: 'center' }}  className="m-1">{(+data?.quantity).toLocaleString('ko-KR',localeStringOptions)}</div>
                       </div>   
                       <div className='flex flex-col w-full'>
-                        <div style={{ textAlign: 'center' }}  className="m-1">{data?.totalPrice}</div>
+                        <div style={{ textAlign: 'center' }}  className="m-1">{(+data?.totalPrice).toLocaleString('ko-KR',localeStringOptions)}</div>
                         <div style={{ textAlign: 'center' }}  className="m-1">{data?.doneAt}</div>
                       </div>
                     </TableCell>
@@ -144,11 +144,11 @@ function MyHistory(props :any) {
                     </TableCell>
                     <TableCell className='flex flex-grow'>
                       <div className='flex flex-col w-full'>
-                        <div style={{ textAlign: 'center' }}  className="m-1" >{data?.price}</div>
-                        <div style={{ textAlign: 'center' }}  className="m-1">{data?.quantity}</div>
+                        <div style={{ textAlign: 'center' }}  className="m-1" >{(+data?.price).toLocaleString('ko-KR',localeStringOptions)}</div>
+                        <div style={{ textAlign: 'center' }}  className="m-1">{(+data?.quantity).toLocaleString('ko-KR',localeStringOptions)}</div>
                       </div>   
                       <div className='flex flex-col w-full'>
-                        <div style={{ textAlign: 'center' }}  className="m-1">{data?.totalPrice}</div>
+                        <div style={{ textAlign: 'center' }}  className="m-1">{(+data?.totalPrice).toLocaleString('ko-KR',localeStringOptions)}</div>
                         <div style={{ textAlign: 'center' }}  className="m-1">{data?.doneAt}</div>
                       </div>
                     </TableCell>
