@@ -2,7 +2,6 @@ import React, { useContext, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import axios from 'axios'
-import { GithubIcon, TwitterIcon } from 'icons'
 import { Input, Label, Button, WindmillContext } from '@roketid/windmill-react-ui'
 
 function CrateAccount() {
@@ -10,8 +9,6 @@ function CrateAccount() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
-  const [checked, setChecked] = useState(false)
-
   const onChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value)
   }
