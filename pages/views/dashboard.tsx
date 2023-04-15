@@ -1,17 +1,12 @@
 import React, { useState, useEffect, HTMLAttributes } from 'react'
-import { Doughnut, Line } from 'react-chartjs-2'
 import {calCoinPrice} from '../../utils/calCoinPrice'
-import CTA from 'example/components/CTA'
 import InfoCard from 'example/components/Cards/InfoCard'
-import ChartCard from 'example/components/Chart/ChartCard'
-import ChartLegend from 'example/components/Chart/ChartLegend'
 import PageTitle from 'example/components/Typography/PageTitle'
 import RoundIcon from 'example/components/RoundIcon'
 import Layout from 'example/containers/Layout'
 import response, { ITableData } from 'utils/demo/tableData'
 import { ChatIcon, CartIcon, MoneyIcon, PeopleIcon } from 'icons'
 import { convertDate } from '../../utils/convertDate'
-import {numberWithCommas} from '../../utils/numberWithCommas'
 import {roundToFiveDecimalPlaces} from '../../utils/roundToFiveDecimalPlaces'
 import {roundToNineDecimalPlaces} from '../../utils/roundToNineDecimalPlaces'
 
@@ -25,27 +20,15 @@ import {
   TableCell,
   TableRow,
   TableFooter,
-  Avatar,
   Badge,
-  Pagination,
   Label,
-  HelperText,
   Input,
-  Textarea,
-  Select,
   Modal,
   ModalHeader,
   ModalBody,
   ModalFooter,
   Button
 } from '@roketid/windmill-react-ui'
-
-import {
-  doughnutOptions,
-  lineOptions,
-  doughnutLegends,
-  lineLegends,
-} from 'utils/demo/chartsData'
 
 import {
   Chart,
@@ -58,7 +41,6 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js'
-import SectionTitle from 'example/components/Typography/SectionTitle'
 interface HTMLDivElementWithAlign extends HTMLAttributes<HTMLDivElement> {
   align?: string;
 }
