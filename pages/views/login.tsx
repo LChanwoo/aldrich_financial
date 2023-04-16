@@ -3,8 +3,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import axios from 'axios'
 import { Label, Input, Button, WindmillContext } from '@roketid/windmill-react-ui'
-import { GithubIcon, TwitterIcon } from 'icons'
-import router from 'next/router'
+
 function LoginPage() {
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
@@ -20,8 +19,6 @@ function LoginPage() {
     const data = {email,password}
     const res = await axios.post("/api/auth",data);
     if(res.status===201){
-      console.log("success")
-      // router.push('/dashboard')
       return window.location.href="/dashboard"
     }
     console.log(res.status)
