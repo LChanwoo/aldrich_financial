@@ -77,13 +77,13 @@ function LoginPage() {
 
               <hr className='my-8' />
 
-              <p className='mt-4'>
+              {/* <p className='mt-4'>
                 <Link href='/example/forgot-password'>
                   <a className='text-sm font-medium text-purple-600 dark:text-purple-400 hover:underline'>
                     Forgot your password?
                   </a>
                 </Link>
-              </p>
+              </p> */}
               <p className='mt-1'>
                 <Link href='/create-account'>
                   <a className='text-sm font-medium text-purple-600 dark:text-purple-400 hover:underline'>
