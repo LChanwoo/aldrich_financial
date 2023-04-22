@@ -112,7 +112,6 @@ export class CoinService {
         totalPrice: transaction.totalPrice,
         };
     });
-    console.log(buyData)
     return { sellData, buyData };
   }
 
