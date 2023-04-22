@@ -4,6 +4,14 @@ import { Card, CardBody } from '@roketid/windmill-react-ui'
 import PageTitle from 'example/components/Typography/PageTitle'
 import Layout from 'example/containers/Layout'
 import axios from 'axios'
+
+//이메일 앞부분 3자리 이외에는 ****로 표시
+function emailMasking(email:string){
+  let emailFront = email.slice(0,3)
+  return emailFront + '****'
+}
+
+
 function Cards(props :any) {
   return (
     <Layout>
@@ -13,7 +21,7 @@ function Cards(props :any) {
         {
         props.ranking.map((user:any, index) => (
           <CardBody>
-            <span className='text-3xl'> {index+1}위 {user.email}</span>
+            <span className='text-3xl'> {index+1}위 {emailMasking(user.email)}</span>
 
               <p className="text-base text-gray-600 dark:text-gray-400">
                 총 매수 : {(user.totalInvested).toLocaleString()}
