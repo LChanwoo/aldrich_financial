@@ -44,10 +44,10 @@ function LoginPage() {
           <main className='flex items-center justify-center p-6 sm:p-12 md:w-1/2'>
             <div className='w-full'>
               <h1 className='mb-4 text-xl font-semibold text-gray-700 dark:text-gray-200'>
-                Login
+                로그인
               </h1>
               <Label>
-                <span>Email</span>
+                <span>이메일</span>
                 <Input
                   className='mt-1'
                   type='email'
@@ -59,7 +59,7 @@ function LoginPage() {
               </Label>
 
               <Label className='mt-4'>
-                <span>Password</span>
+                <span>패스워드</span>
                 <Input
                   className='mt-1'
                   type='password'
@@ -87,7 +87,7 @@ function LoginPage() {
               <p className='mt-1'>
                 <Link href='/create-account'>
                   <a className='text-sm font-medium text-purple-600 dark:text-purple-400 hover:underline'>
-                    Create account
+                    계정 생성
                   </a>
                 </Link>
               </p>
