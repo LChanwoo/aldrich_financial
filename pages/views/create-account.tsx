@@ -48,18 +48,18 @@ function CrateAccount() {
           <main className="flex items-center justify-center p-6 sm:p-12 md:w-1/2">
             <div className="w-full">
               <h1 className="mb-4 text-xl font-semibold text-gray-700 dark:text-gray-200">
-                Create account
+                계정 생성하기
               </h1>
               <Label>
-                <span>Email</span>
+                <span>이메일</span>
                 <Input className="mt-1" type="email" placeholder="john@doe.com" value={email} onChange={onChangeEmail}/>
               </Label>
               <Label className="mt-4">
-                <span>Password</span>
+                <span>비밀번호</span>
                 <Input className="mt-1" placeholder="***************" type="password" value={password} onChange={onChangePassword}/>
               </Label>
               <Label className="mt-4">
-                <span>Confirm password</span>
+                <span>비밀번호 확인</span>
                 <Input className="mt-1" placeholder="***************" type="password" />
               </Label>
 
@@ -71,7 +71,7 @@ function CrateAccount() {
               </Label>
 
                 <Button block className="mt-4" onClick={handleSubmit}>
-                  Create account
+                  계정 생성
                 </Button>
 
               <hr className="my-8" />
@@ -81,7 +81,7 @@ function CrateAccount() {
                   <a
                     className="text-sm font-medium text-purple-600 dark:text-purple-400 hover:underline"
                   >
-                    Already have an account? Login
+                    이미 계정이 있으신가요? 로그인 하기
                   </a>
                 </Link>
               </p>
