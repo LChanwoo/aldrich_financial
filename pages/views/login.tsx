@@ -26,7 +26,7 @@ function LoginPage() {
   }
 
   const { mode } = useContext(WindmillContext)
-  const imgSource = mode === 'dark' ? '/assets/img/login-office-dark.jpeg' : '/assets/img/login-office.jpeg'
+  const imgSource =  '/assets/img/logo.png'
 
   return (
     <div className='flex items-center min-h-screen p-6 bg-gray-50 dark:bg-gray-900'>

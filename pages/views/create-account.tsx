@@ -29,7 +29,7 @@ function CrateAccount() {
     }
   }
 
-  const imgSource = mode === 'dark' ? '/assets/img/create-account-office-dark.jpeg' : '/assets/img/create-account-office.jpeg'
+  const imgSource ='/assets/img/create-account-logo.png'
 
 
   return (
