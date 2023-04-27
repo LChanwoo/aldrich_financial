@@ -32,7 +32,6 @@ async function bootstrap() {
       credentials: true,
     }
   );
-  // app.useGlobalFilters(new HttpExceptionFilter());
   app.useStaticAssets(join(__dirname, '..', 'public'));
   app.use(passport.initialize());
   app.use(passport.session());

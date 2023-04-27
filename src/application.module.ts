@@ -6,7 +6,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { EventModule } from './gateway/event.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UserModule } from './user/user.module';
-import * as redisStore from 'cache-manager-ioredis';
 import { Coin } from './entities/Coin.entity';
 import { Transaction } from './entities/Transaction.entity';
 import { Portfolio } from './entities/Portfolio.entity';
@@ -14,7 +13,6 @@ import { User } from './entities/User.entity';
 import { AuthModule } from './auth/auth.module';
 import { CoinModule } from './coin/coin.module';
 import { TaskModule } from './task/task.module';
-import { CrawlingModule } from './task/crawling/crawling.module';
 import { News } from './entities/News.entity';
 
 
