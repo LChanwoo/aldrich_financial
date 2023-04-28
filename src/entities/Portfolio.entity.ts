@@ -1,7 +1,5 @@
 import { Entity, Column, ManyToOne, PrimaryGeneratedColumn, JoinColumn, OneToMany, OneToOne } from 'typeorm';
 import { User } from './User.entity';
-import { Coin } from './Coin.entity';
-
 @Entity()
 export class Portfolio {
   @PrimaryGeneratedColumn()

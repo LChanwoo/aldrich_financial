@@ -1,6 +1,5 @@
 import { Entity, Column, ManyToOne, PrimaryGeneratedColumn, OneToOne, CreateDateColumn, UpdateDateColumn, JoinColumn } from 'typeorm';
 import { User } from './User.entity';
-import { Coin } from './Coin.entity';
 
 @Entity()
 export class Transaction {
