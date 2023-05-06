@@ -21,7 +21,7 @@ export class Portfolio {
   totalInvested?: number;
 
   @ManyToOne(() => User, (user) => user.portfolios)
-  @JoinColumn({ name: 'user_id' })
+  @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user?: User;
 
 
