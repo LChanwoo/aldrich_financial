@@ -65,9 +65,7 @@ export class CoinService {
         const totalEvaluated = portfolioData.reduce((acc,cur)=>acc+ +cur.evaluatedPrice,0)
         const totalGainAndLoss = totalEvaluated -totalPurchase
         let profitRate = +isNaN(Math.round((portfolioData.reduce((acc:any,cur:any)=>acc+ +cur.evaluatedGainAndLoss,0)/portfolioData.reduce((acc:any,cur:any)=>acc+ +cur.totalInvested,0))*10000)/100)? 0 : Math.round((portfolioData.reduce((acc:any,cur:any)=>acc+ +cur.evaluatedGainAndLoss,0)/portfolioData.reduce((acc:any,cur:any)=>cur.totalInvested,0))*10000)/100
-        // if(isNaN(profitRate)){
-        //   profitRate = 0;
-        // }
+
         const returns = { 
           coinPrice : coinPrice.map(e=>JSON.parse(e)),
           balance,
