@@ -3,8 +3,6 @@ import { Server, Socket } from 'socket.io';
 import { CACHE_MANAGER, Inject, Injectable } from '@nestjs/common';
 import { InjectRedis, DEFAULT_REDIS_NAMESPACE } from '@liaoliaots/nestjs-redis';
 import Redis from 'ioredis';
-import { RedisService } from '@liaoliaots/nestjs-redis';
-
 @Injectable()
 @WebSocketGateway({ namespace: 'ws-coin-price' })
 export class CoinPriceGateway implements OnGatewayConnection, OnGatewayDisconnect {
