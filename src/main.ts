@@ -5,7 +5,6 @@ import cookieParser from 'cookie-parser';
 import passport from 'passport';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
-import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 import RedisStore from 'connect-redis';
 import { Redis } from 'ioredis';
 async function bootstrap() {
