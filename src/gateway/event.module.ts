@@ -1,7 +1,6 @@
 
-import { CacheModule, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import * as redisStore from 'cache-manager-ioredis';
 import { EventController } from './event.controller';
 import { WebSocketService } from './web-socket.service';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
