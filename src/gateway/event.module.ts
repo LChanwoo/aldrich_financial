@@ -1,6 +1,6 @@
 
 import { Module } from '@nestjs/common';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule} from '@nestjs/config';
 import { EventController } from './event.controller';
 import { WebSocketService } from './web-socket.service';
 import { RedisModule } from '@liaoliaots/nestjs-redis';
