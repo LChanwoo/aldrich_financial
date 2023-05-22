@@ -1,7 +1,4 @@
 import { Controller, Get, Req, UseGuards, Body, Post, UseFilters, Delete } from '@nestjs/common';
-import { SessionGuard } from '../auth/session.guard';
-import { LocalAuthGuard } from '../auth/auth.guard';
-import { LoginDto } from '../auth/dto/login.dto';
 import { User } from '../common/decorators/user.decorator';
 import { CoinService } from './coin.service';
 import { AuthenticatedGuard } from '../auth/authenticated.guard';
