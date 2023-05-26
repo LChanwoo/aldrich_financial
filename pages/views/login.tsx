@@ -21,7 +21,6 @@ function LoginPage() {
     if(res.status===201){
       return window.location.href="/dashboard"
     }
-    console.log(res.status)
     return location.reload()
   }
 
