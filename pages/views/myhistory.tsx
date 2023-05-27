@@ -117,16 +117,6 @@ function MyHistory(props :any) {
                     <div style={{ textAlign: 'center' }}  className="m-1">거래시간</div>
                   </div>
                 </TableCell>
-                {/* <TableCell >
-                  가격
-                  <br/>
-                  수량
-                  </TableCell>
-                <TableCell >
-                  총금액
-                  <br/>
-                  거래시간
-                </TableCell> */}
               </tr>
             </TableHeader>
             <TableBody>
