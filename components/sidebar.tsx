@@ -1,7 +1,7 @@
 import { FC } from 'react';
 import Link from 'next/link';
 
-const Sidebar: FC = () => {
+const Sidebar = () => {
   return (
     <div>
       <div style={{ marginBottom: 15 }}>

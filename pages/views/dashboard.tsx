@@ -4,7 +4,7 @@ import InfoCard from 'example/components/Cards/InfoCard'
 import PageTitle from 'example/components/Typography/PageTitle'
 import RoundIcon from 'example/components/RoundIcon'
 import Layout from 'example/containers/Layout'
-import response, { ITableData } from 'utils/demo/tableData'
+import response from 'utils/demo/tableData'
 import { ChatIcon, CartIcon, MoneyIcon, PeopleIcon } from 'icons'
 import { convertDate } from '../../utils/convertDate'
 import {roundToFiveDecimalPlaces} from '../../utils/roundToFiveDecimalPlaces'
@@ -41,9 +41,7 @@ import {
   Tooltip,
   Legend,
 } from 'chart.js'
-interface HTMLDivElementWithAlign extends HTMLAttributes<HTMLDivElement> {
-  align?: string;
-}
+
 export const localeStringOptions = { minimumFractionDigits: 0, maximumFractionDigits: 8 };
 
 function Dashboard(coinData) {
@@ -269,8 +267,10 @@ function Dashboard(coinData) {
       const newTotalValue = newPortfolioData.reduce((acc:any,cur:any)=>acc+ +cur.evaluatedPrice,0)
       setPortfolioData(newPortfolioData)
       setTotalValue(newTotalValue)
-      setGainsAndLoses( newPortfolioData.reduce((acc:any,cur:any)=>acc+ +cur.evaluatedGainAndLoss,0))
-      setProfitRate(isNaN(Math.round((newPortfolioData.reduce((acc:any,cur:any)=>acc+ +cur.evaluatedGainAndLoss,0)/newPortfolioData.reduce((acc:any,cur:any)=>acc+ +cur.totalInvested,0))*10000)/100)? 0 : Math.round((newPortfolioData.reduce((acc:any,cur:any)=>acc+ +cur.evaluatedGainAndLoss,0)/newPortfolioData.reduce((acc:any,cur:any)=>cur.totalInvested,0))*10000)/100)
+      let gainsAndLoses = newPortfolioData.reduce((acc:any,cur:any)=>acc+ +cur.evaluatedGainAndLoss,0)
+      setGainsAndLoses( gainsAndLoses)
+      //setProfitRate(isNaN(Math.round((newPortfolioData.reduce((acc:any,cur:any)=>acc+ +cur.evaluatedGainAndLoss,0)/newPortfolioData.reduce((acc:any,cur:any)=>acc+ +cur.totalInvested,0))*10000)/100)? 0 : Math.round((newPortfolioData.reduce((acc:any,cur:any)=>acc+ +cur.evaluatedGainAndLoss,0)/newPortfolioData.reduce((acc:any,cur:any)=>cur.totalInvested,0))*10000)/100)
+      setProfitRate(isNaN(Math.round((gainsAndLoses/totalPurchase)*10000)/100)? 0 : Math.round((gainsAndLoses/totalPurchase)*10000)/100)
       setTotalAsset(+newTotalValue+ +balance)
     });
     return () => {
@@ -303,7 +303,7 @@ function Dashboard(coinData) {
               iconColorClass="text-blue-500 dark:text-blue-100"
               bgColorClass="bg-blue-100 dark:bg-blue-500"
               className="mr-4 "
-            />
+            /> 
           </InfoCard>
           <InfoCard title="가용KRW" value={roundToFiveDecimalPlaces(+availableBalance).toLocaleString()} className="w-1/2">
             {/* @ts-ignore */}

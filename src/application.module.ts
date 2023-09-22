@@ -15,12 +15,14 @@ import { CoinModule } from './coin/coin.module';
 import { TaskModule } from './task/task.module';
 import { News } from './entities/News.entity';
 
+console.log(process.env.MYSQL_ROOT_PASSWORD)
 
 @Module({
   imports: [
     EventModule,
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: '.env',
     }),
     RenderModule.forRootAsync(
       Next({

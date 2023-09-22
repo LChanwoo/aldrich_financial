@@ -2,21 +2,18 @@ import React, { useContext, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import axios from 'axios'
-import { Input, Label, Button, WindmillContext } from '@roketid/windmill-react-ui'
+import { Input, Label, Button} from '@roketid/windmill-react-ui'
 
 function CrateAccount() {
-  const { mode } = useContext(WindmillContext)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const onChangeEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value)
   }
-
   const onChangePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value)
   }
-
   const handleSubmit = async (e: any) => {
     e.preventDefault()
     const res = await axios.post('/api/user', {

@@ -3,8 +3,6 @@ import ChartCard from 'example/components/Chart/ChartCard'
 import PageTitle from 'example/components/Typography/PageTitle'
 import Layout from 'example/containers/Layout'
 import {
-} from 'utils/demo/chartsData'
-import {
   Chart,
   ArcElement,
   BarElement,
@@ -20,6 +18,18 @@ import axios from 'axios'
 import { Table, TableBody, TableCell, TableContainer, TableFooter, TableHeader, TableRow } from '@roketid/windmill-react-ui'
 import { localeStringOptions } from './dashboard'
 function Charts({chartLegends, chartPercentage, backgroundColor, portfolioData, nowDate,}) {
+  // if(portfolioData.length === 0){
+  //   return (
+  //     <Layout>
+  //       <PageTitle>포트폴리오</PageTitle>
+  //       <div className="grid gap-6 mb-8 md:grid-cols-2">
+  //         <ChartCard title="포트폴리오 차트">
+  //           "현재 보유하고 있는 코인이 없습니다."
+  //         </ChartCard>
+  //       </div>
+  //     </Layout>
+  //   )
+  // }
   Chart.register(
     ArcElement,
     BarElement,
@@ -53,6 +63,15 @@ function Charts({chartLegends, chartPercentage, backgroundColor, portfolioData, 
 }
 
   return (
+    portfolioData.length === 0 ?
+    
+    <Layout>
+      <PageTitle>포트폴리오</PageTitle>
+      <div className="grid gap-6 mb-8 md:grid-cols-2">
+          "현재 보유하고 있는 코인이 없습니다."
+      </div>
+    </Layout>
+    :
     <Layout>
       <PageTitle>포트폴리오</PageTitle>
 
@@ -137,12 +156,6 @@ function Charts({chartLegends, chartPercentage, backgroundColor, portfolioData, 
             </TableBody>
           </Table>
           <TableFooter>
-            {/* <Pagination
-              totalResults={totalResults}
-              resultsPerPage={resultsPerPage}
-              label="Table navigation"
-              onChange={onPageChange}
-            /> */}
             {nowDate} 기준
           </TableFooter>
         </TableContainer>

@@ -6,7 +6,7 @@ import PageTitle from 'example/components/Typography/PageTitle'
 import SectionTitle from 'example/components/Typography/SectionTitle'
 
 import Layout from 'example/containers/Layout'
-import { MailIcon } from 'icons'
+//import { MailIcon } from 'icons'
 
 function Forms() {
   return (

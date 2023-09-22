@@ -58,8 +58,8 @@ export function calCoinPrice(price:any ) : number {
 
   // 거래 가격을 거래 단위로 나누어서 소숫점 이하를 버리고, 다시 거래 단위를 곱하여 최종 거래 가격을 계산합니다.
   const result = Math.floor(price / unit) * unit;
-  console.log("price", price)
-  console.log("unit", unit)
-  console.log("price/unit", price/unit)
+  // console.log("price", price)
+  // console.log("unit", unit)
+  // console.log("price/unit", price/unit)
   return result;
 }

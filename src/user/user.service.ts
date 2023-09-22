@@ -46,9 +46,11 @@ export class UserService {
 
   public async createUser(createUserDto: CreateUserDto) {
     const user = new User();
-    user.email = createUserDto.email;
     const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
+
+    user.email = createUserDto.email;
     user.password = hashedPassword;
+    
     return this.userRepository.save(user);
   }
 
@@ -112,9 +114,6 @@ export class UserService {
             evaluatedGainAndLoss: +((portfolio.quantity * currentPrice) - portfolio.totalInvested).toFixed(8),
           }
       })
-      if(userInfo.portfolios.length === 0){
-        return [];
-      }
       const currentPricesPromises = userInfo.portfolios.map(async (portfolio) => {
         const res = await this.redis.getClient().get(portfolio.market)
         return {
@@ -136,7 +135,16 @@ export class UserService {
       });
     
       if(userInfo.portfolios.length === 0){
-        return [];
+        const now = new Date();
+        const nowDate = now.toISOString().substr(0, 10);
+        const chartData = {
+          chartLegends,
+          chartPercentage,
+          backgroundColor,
+          portfolioData,
+          nowDate
+        };
+        return chartData;
       }
       if(userInfo.portfolios.length >= 10){
         chartPercentage[9] = 100 - chartPercentage.slice(0, 9).reduce((acc, cur) => acc + cur, 0);

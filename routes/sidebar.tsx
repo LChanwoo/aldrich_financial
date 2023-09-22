@@ -26,28 +26,28 @@ export function routeIsActive (pathname: String, route: IRoute): boolean {
 const routes: IRoute[] = [
   {
     path: '/dashboard', // the url
-    icon: 'HomeIcon', // the component being exported from icons/index.js
+    //icon: 'HomeIcon', // the component being exported from icons/index.js
     name: '대쉬보드', // name that appear in Sidebar
     exact: true,
   },
   {
     path: '/portfolio',
-    icon: 'ChartsIcon',
+    //icon: 'ChartsIcon',
     name: '포트폴리오',
   },
   {
     path: '/myhistory',
-    icon: 'ChartsIcon',
+    //icon: 'ChartsIcon',
     name: '내거래내역',
   },
   {
     path: '/ranking',
-    icon: 'CardsIcon',
+    //icon: 'CardsIcon',
     name: '투자순위',
   },
   {
     path: '/news',
-    icon: 'CardsIcon',
+    //icon: 'CardsIcon',
     name: '코인뉴스',
   },
   // {

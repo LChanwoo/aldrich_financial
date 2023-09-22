@@ -18,13 +18,11 @@ export class CrawlingScheduler {
 
   @Interval(60 * 1000) // 1시간마다 실행
   async handleCrawling() {
-    // this.logger.log('Crawling started');
     try {
       const newsList = await this.crawlingService.crawlNews();
       await this.crawlingService.saveNews(newsList); 
     } catch (error) {
       this.logger.error('Crawling failed', error);
     }
-    // this.logger.log('Crawling finished');
   }
 }

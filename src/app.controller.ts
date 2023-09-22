@@ -49,7 +49,7 @@ export class AppController {
   @Get('/dashboard')
   @UseGuards(AuthenticatedGuard)
   @UseFilters(new HttpExceptionFilter())
-  public dashboard(@Req() req:any, @User() user:UserDataDto) {
+  public async dashboard(@Req() req:any, @User() user:UserDataDto) {
     const props = this.coinService.coinPrice(user);
     return { props };
   }

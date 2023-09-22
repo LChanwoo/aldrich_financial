@@ -96,7 +96,7 @@ export class CoinService {
         transactionType: transaction.transactionType,
         price: transaction.price,
         quantity: transaction.quantity,
-        doneAt: convertDate(transaction.doneAt.toDateString()),
+        doneAt: convertDate(transaction.doneAt.toLocaleString()),
         totalPrice: transaction.totalPrice,
       }
     });
@@ -106,7 +106,7 @@ export class CoinService {
         transactionType: transaction.transactionType,
         price: transaction.price,
         quantity: transaction.quantity,
-        doneAt: convertDate(transaction.doneAt.toDateString()),
+        doneAt: convertDate(transaction.doneAt.toLocaleString()),
         totalPrice: transaction.totalPrice,
         };
     });

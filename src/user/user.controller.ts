@@ -17,15 +17,15 @@ export class UserController {
     return this.userService.getUsers();
   }
   
-  @Post('/kill')
-  public async killUser(@Body('id') id:number ) {
-    return this.userService.killUser(id);
-  }
+  // @Post('/kill')
+  // public async killUser(@Body('id') id:number ) {
+  //   return this.userService.killUser(id);
+  // }
 
-  @Delete('/killall')
-  public async killAllUser() {
-    return this.userService.killAllUser();
-  }
+  // @Delete('/killall')
+  // public async killAllUser() {
+  //   return this.userService.killAllUser();
+  // }
 
   @Post()
   public async createUser(@Body() createUserDto: CreateUserDto) {
@@ -53,7 +53,7 @@ export class UserController {
   @Get('/portfolioChart')
   @UseGuards(AuthenticatedGuard)
   public async getPortfolioChart(@User() user: UserDataDto) {
-    return this.userService.getPortfolioChartData(user);
+    return await this.userService.getPortfolioChartData(user);
   }
 
   
